@@ -1,0 +1,23 @@
+Eros433 
+Sample Team Contract
+
+Goals:
+-develop Software
+-test-driven delevopment
+-automatic testing, travis
+
+Expectations:
+-divide the tasks appropriately
+-use multiple different files
+-debrifing at the end of the day
+
+Policies and Procedures:
+-implement and solve the ODEs (Monday) -> Monday
+-think about reasonable values (mass, average quantities, angle, diameters, ...) -> Monday
+-plot graphs
+-documentation later (Tuesday, Wednesday)
+-testing, test-driven development
+
+Consequences:
+-address in group meetings
+-raise early

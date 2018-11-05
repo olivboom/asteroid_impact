@@ -1,0 +1,12 @@
+Questions:
+-threshold between two types of breakup (density of rocks?) -> paper
+-influence of lift on angle of entry? -> very small
+-what about other forms of energy? -> just kinetic
+-geometry changes. Does cd change? -> no
+-do other parameters like atmospheric scale heigth H etc. change? -> no
+-exact range of size/diameter of asteroid? Ranges of other values? -> paper, find out yourselves
+-material of the asteroid? -> paper, find out yourselves
+-angle range? 0-90
+-rate of change of gravity considered? - no
+-sigma_0: yield stress, yield strength, tensile strength, bulk strength, is an input
+- model shockwave? - no
