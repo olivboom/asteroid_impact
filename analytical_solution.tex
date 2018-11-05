@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\DeclareMathOperator{\Tr}{Tr}
+\usepackage{physics}
+\usepackage{xcolor}
+
+\title{Analytical Solution of Asteroid ODEs}
+\author{Eros433}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\noindent\begin{minipage}{.5\linewidth}
+\begin{align*}
+\begin{cases}
+\frac{{\rm d}v}{{\rm d}t}&=\frac{-c_{{\rm D}}\,\rho_{\rm a}(z)}{2\,m}+g\,{\rm sin}(\theta)\\[0.3cm]
+\frac{{\rm d}m}{{\rm d}t}&=\frac{-c_{{\rm H}}\,\rho_{\rm a}(z)}{2\,Q}\\[0.3cm]
+\frac{{\rm d}\theta}{{\rm d}t}&=\frac{g\,{\rm cos}(\theta)}{v}-\frac{c_{\rm L}\,\rho_{{\rm a}(z)}\,A\,v}{2\,m}-\frac{v\,{\rm cos}(\theta)}{R_{\rm P}+z}\\[0.3cm]
+\frac{{\rm d}z}{{\rm d}t}&=-v\,{\rm sin}(\theta)\\[0.5cm]
+\frac{{\rm d}x}{{\rm d}t}&=\frac{v\,{\rm cos}(\theta)}{1+\frac{z}{R_{\rm P}}}\\[0.3cm]
+\rho_a(z)&=\rho_0\,e^{-\frac{z}{H}}\\[0.3cm]
+\frac{{\rm d}r}{{\rm d}t}&=\left[\frac{7}{2}\,\alpha\frac{\rho_{\rm a}}{\rho_{{\rm m}}}\right]^{\frac{1}{2}}\\[0.3cm]
+\rho_{\rm a}(z)\,v^{\rm 2}&=\sigma_{\rm 0}
+\end{cases}
+\rightarrow
+\end{align*}
+\end{minipage}%
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+\begin{cases}
+\frac{{\rm d}v}{{\rm d}t}&=\frac{-c_{{\rm D}}\,\rho_{\rm a}(z)}{2\,m}\\[0.3cm]
+\frac{{\rm d}m}{{\rm d}t}&=0\\[0.3cm]
+\frac{{\rm d}\theta}{{\rm d}t}&=0\\[0.3cm]
+\frac{{\rm d}z}{{\rm d}t}&=-v\,{\rm sin}(\theta)\\[0.3cm]
+\frac{{\rm d}x}{{\rm d}t}&=v\,{\rm cos}(\theta)\\[0.3cm]
+\rho_a(z)&=\rho_0\,e^{-\frac{z}{H}}\\[0.3cm]
+\frac{{\rm d}r}{{\rm d}t}&=0\\[0.3cm]
+\end{cases}
+\end{align*}
+\end{minipage}
+\\[0.5cm]
+$\rightarrow m={\rm const.},\theta={\rm const.},r={\rm const.}$\\[0.3cm]
+$\{\frac{{\rm d}v}{{\rm d}t}=\frac{-c_{\rm D}\,\rho_{\rm a}(z)\,A\,v^{\rm 2}}{2\,m},\frac{{\rm d}z}{{\rm d}t}=-v\,{\rm sin}(\theta)\} \leftrightarrow \{{\rm d}t=\frac{2\,m}{-c_{\rm D}\,\rho_{\rm a}(z)\,A\,v^{\rm 2}}{\rm d}v,{\rm d}z=-v\,{\rm sin}(\theta){\rm d}t\}$\\[0.3cm]
+${\rm d}z=\underbrace{\frac{2\,m\,{\rm sin}(\theta)}{c_{\rm D}\,A}}_{:=\zeta}\frac{1}{\rho_{\rm a}(z)}\frac{v}{v^{\rm 2}}{\rm d}v=\zeta\,\frac{{\rm d}v}{v}$\\[0.3cm]
+$\displaystyle\int{\rho_{\rm a}(z){\rm d}z}=\zeta\,\int\frac{{\rm d}v}{v}$\\[0.3cm]
+$-H\,e^{-\frac{z}{H}}+{\rm const.}=\zeta\,{\rm ln}(v)$\\[0.3cm]
+${\rm ln}(v)=\underbrace{-\frac{H\,c_{\rm D}\,A}{2\,m\,{\rm sin}(\theta)}}_{={\rm const.}}\,e^{-\frac{z}{H}}+{\rm const.}$\\[0.3cm]
+\end{document}
