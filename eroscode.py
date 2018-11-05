@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
+from scipy.integrate import solve_ivp
 
 def inital_parameter():
     global C_D
@@ -29,10 +30,11 @@ def inital_parameter():
 def initial_variables():
     v_init = 20e3  # initial body axes velocity of asteroid
     m_init = 1000 # initial mass in kg
-    theta_init = 40 * np.pi / 180
+    theta_init = 90 * np.pi / 180
     z_init = 100e3 # initial altitude in metres
     x_init = 0  # initial horizontal displacement
     r_init = 3  # initial radius of the asteroid
+#    m_init = 4/3 * np.pi * r_init**3 * 3300
 
     '''
     Where to include data around initial volume and mass
@@ -50,7 +52,7 @@ def KE(m, v):
 
 
 def dv(z, r, v, theta, m):
-    return ((-C_D * rho_a(z) * A(r) * v ** 3) / (2 * m) + g_E * np.sin(theta))
+    return ((-C_D * rho_a(z) * A(r) * v ** 2) / (2 * m) + g_E * np.sin(theta)) 
 
 
 def rho_a(z):
@@ -66,7 +68,7 @@ def dtheta(theta, v, z, m, r):
 
 
 def dx(theta, v, z):
-    return (v * np.cos(theta)) / (1 + z / R_E)
+    return (v * np.cos(theta)) / (1 + (z / R_E))
 
 
 def dm(z, v):
@@ -85,6 +87,7 @@ def dr(z, m, r):
     return (7 / 2 * alpha * rho_a(z) / (m/Volume(r))) # need to decide whether to store volume
 
 
+
 def f(t, state):
     f = np.zeros_like(state)
     v, m, theta, z, x, r = state
@@ -98,29 +101,66 @@ def f(t, state):
 
 
 def main():
+    
+# =============================================================================
+#     SOLVE_IVP
+# =============================================================================
     inital_parameter()
     state0 = initial_variables()
     dt = 0.1
     t = np.arange(0.0, 40.0, dt)
-    states = odeint(f, state0, t, tfirst=True)
-    vs = states[:, 0]
-    dz = states[:, 3]
-    plt.plot(t, vs)
-    plt.show()
-    plt.plot(t, dz)
-    plt.show()
+    states = solve_ivp(f, (0,50), state0, t_eval = t, method = 'RK45')
+    v = states.y[0]
+    m = states.y[1]
+    theta = states.y[2]
+    z = states.y[3]
+    x = states.y[4]
+    r = states.y[5]
+    KE = 0.5 * m * v**2
+
+    plt.figure()
+    plt.subplot(311)
+    plt.plot(t,z)
+    plt.ylabel("Height")
+    
+    plt.subplot(312)
+    plt.ylabel("Speed")
+    plt.plot(t,v)
+    plt.plot
+    
+    plt.subplot(313)
+    plt.ylabel("Energy")
+    plt.xlabel("Time")
+
+    plt.plot(t,KE)
 
 # =============================================================================
-# def f(t, y):
-#     f = np.zeros_like(y)
-# 
-#     v, m, theta, z ,x = y
-#     
-#     f[0] = (-C_D * rho_a 
-#     f[1] = x * (rho - z) - y
-#     f[2] = x * y - beta * z
-#     
+# ODEINT
 # =============================================================================
+    
+#    states = odeint(f, state0, t, tfirst = True)
+#    
+#    v = states[:, 0]
+#    m = states[:, 1]
+#    theta = states[:, 2]
+#    z = states[:, 3]
+#    x = states[:,4]
+#    r = states[:,5]
+#    
+#    
+#    KE = 0.5 * m * v**2
+#    
+#    
+#    plt.figure()
+#    plt.subplot(211)
+#    plt.plot(t,z)
+#    plt.ylabel("Height")
+#    
+#    plt.subplot(212)
+#    plt.ylabel("Speed")
+#    plt.xlabel("Time")
+#    plt.plot(t,v)
+
 
 main()
 if __name__ == "main":
