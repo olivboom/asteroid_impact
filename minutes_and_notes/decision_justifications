@@ -1,3 +1,6 @@
 Choice of numerical scheme for atmosphiric scale height
 
 Choice of ODE solving scheme
+
+Have chosen spherical for calculation of mass, but have used circle for
+drag coefficient. 
