@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
-#from scipy.integrate import odeint
+
+
+# from scipy.integrate import odeint
 
 # the issue is that the velocity is falling off too quickly
 # should be decreasing inverse exponentially
@@ -157,7 +159,7 @@ def graph_plot(t, states):
     plt.ylabel('Velocity (m/s)')
     plt.show()
 
-    plt.plot(t,  states[:, 3])
+    plt.plot(t, states[:, 3])
     plt.xlabel('Time (s)')
     plt.ylabel('Altitude (m)')
     plt.show()
@@ -169,10 +171,10 @@ def graph_plot(t, states):
 
     plt.figure()
     plt.subplot(211)
-    plt.plot(t,  states[:, 3])
+    plt.plot(t, states[:, 3])
     plt.ylabel('Height')
     plt.subplot(212)
-    plt.plot(t,  states[:, 3])
+    plt.plot(t, states[:, 3])
     plt.ylabel('Speed')
     plt.xlabel('Time')
     plt.show()
@@ -200,14 +202,14 @@ def main():
     #     SOLVE_IVP
     # =============================================================================
 
-    states = solve_ivp(ode_solver, (0,50), state0, t_eval = t, method = 'RK45')  # need to fix the f tomorrow
+    states = solve_ivp(ode_solver, (0, 50), state0, t_eval=t, method='RK45')  # need to fix the f tomorrow
     v = states.y[0]
     m = states.y[1]
     theta = states.y[2]
     z = states.y[3]
     x = states.y[4]
     r = states.y[5]
-    KE = 0.5 * m * v**2
+    KE = 0.5 * m * v ** 2
 
     plt.figure()
     plt.subplot(311)
@@ -226,11 +228,8 @@ def main():
     plt.plot(t, KE)
     plt.show()
 
-
     # states = odeint(ode_solver, state0, t, tfirst=True)
     # graph_plot(t, states)
-
-
 
 
 main()
@@ -238,13 +237,11 @@ main()
 #     main()
 
 
-
-
 '''
 =============================================================================
 ODEINT
 =============================================================================
-    
+
 states = odeint(f, state0, t, tfirst = True)
 
 v = states[:, 0]
