@@ -19,21 +19,53 @@ Calculating the rate change of gravity
 
 Questions for Gareth - 
 Density of the asteroids
-Can we get access to the slides - also having access to the recording
-Reentry corridor limits. At what angle will it bounce off of the earth
-How are we quantifying the energy loss. Is it just KE loss
-Does do we model Cd change. Is Cd constant
-How are we modelling the geometric change of the asteroid
-What is the minimum deflection angle
-Should we include the rate change of gravity
-How to get the values for atmospheric scale height
-Is burst altitude just the altitude where stresses exceed the yield stress
-Is sigma_0 called yield strength
-Do we need to take into account the shock wave
-Is heat ablation constant constant (lol)
-Is it 3d -this would affect astroid geometry and also curvature of the earth
-Did Gareth mention something about licensing the software
+- Will be given a paper giving the distributuion of the input parameters
 
+Can we get access to the slides - also having access to the recording
+- Yes will be made available
+How is software tested
+- Tested by humans with instruction
+Influence of lift on angle of enterance
+- Will be very small. Should still be looked into
+Reentry corridor limits. At what angle will it bounce off of the earth
+- Work out the limits outselved. But from 0 degrees to 90 will
+need to be calcualted
+How are we quantifying the energy loss. Is it just KE loss
+- Very naunced transfers between energy types. Only want to record
+the loss of KE and assume that is deposited into the atmosphere
+Does do we model Cd change. Is Cd constant
+- Coefficient are taken as constant 
+How are we modelling the geometric change of the asteroid
+- Cross sectional area is the only thing of interest. Because Cd
+is taken to be 1 so not a problem. 
+Should we include the rate change of gravity
+- Gravity is taken to be constant
+How to get the values for atmospheric scale height
+- Given table and have to interpolate between them. Will need 
+interpolation skills from ACSE-3
+Range of asteroid size
+- 1 micron to size of Mars. Think about the 3m rock analogy and the
+relevant implications.
+Is burst altitude just the altitude where stresses exceed the yield stress
+- Breakup altitude is where the stresses exceed the yield stress. 
+Bust is maximum deceleration.
+Is sigma_0 called yield strength
+- Its an input parameter. Is the asteroid tensile strength. Can use range
+of infered tensile strength of asteroids. Also called bulk strength.
+Do we need to take into account the shock wave
+- No modelling of shockwaves.
+Is heat ablation constant constant (lol)
+- Taken as constant. SI units. 
+Is it 3d -this would affect astroid geometry and also curvature of the earth
+- Taken to be a circular with the radius of the earth 
+Did Gareth mention something about licensing the software
+- Pick a license. Just about going through the process of picking a license.
+
+Clarification of points by Gareth
+- rho0 is taken to be 1.2kg (the density of air at sea level.)
+- when calcualting the energy lost per unit height it should always
+be calculated for altitude not from the path length.
 
 Links
+
 Asteroid yield strength - stackx https://space.stackexchange.com/questions/605/what-is-the-range-of-strength-for-asteroidal-materials/607#607
