@@ -8,7 +8,7 @@ from scipy.integrate import solve_ivp
 # the issue is that the velocity is falling off too quickly
 # should be decreasing inverse exponentially
 
-
+#
 def inital_parameter():
     """
     Creating the initial conditions for the quantities
