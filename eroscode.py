@@ -21,11 +21,15 @@ def inital_parameter():
     C_D  : float,  dimensionless
         Coefficient of drag.
 
-    C_H : float, dimensionless
+    C_H : float, W/(m**2*K)
         The heat transfer coefficient
 
-    Q : float, **********
+    Q : float, K*s/W  
         The heat of ablation constant
+		# consider unit equation for:
+		# dm/dt=(-C_H * rho_a(z) * area(r) * v ** 3) / (2 * Q)
+	    # [kg/s]=[W/(K*m**2)]*[kg/m**3]*[m**2]*[m**3/s**3]/{Q}
+        # -> {Q}=[K*s]/[W]
 
     C_L : float, dimensionless
         The coefficient of lift
@@ -33,7 +37,7 @@ def inital_parameter():
     alpha : float, dimensionless
         Dispersion coefficient
 
-    H : float, ************
+    H : float, m
         Atmospheric scale height
 
     rho_0 : float, kg / m ** 3
@@ -98,12 +102,12 @@ def initial_variables():
         The initial condition for the radius of the asteroid
     """
 
-    v_init = 20e3
+    v_init = 19e3
     m_init = 1000
-    theta_init = 40 * np.pi / 180
+    theta_init = 20 * np.pi / 180
     z_init = 100e3
     x_init = 0
-    r_init = 3
+    r_init = 19.5
     return np.array([v_init,
                      m_init,
                      theta_init,
@@ -153,6 +157,22 @@ def dr(z, m, r):
     return 7 / 2 * alpha * rho_a(z) / (m / volume(r))
 
 
+def density(m,r):
+    return m/volume(r)	
+	
+	
+def mass(rho,r):
+    return rho*volume(r)
+	
+
+def deg_to_rad(deg):
+    return deg*np.pi/ 180
+
+	
+def rad_to_degrees(rad):
+    return rad*180/np.pi
+	
+	
 def graph_plot(t, states):
     plt.plot(t, states[:, 0])
     plt.xlabel('Time (s)')
