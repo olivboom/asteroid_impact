@@ -1,0 +1,39 @@
+Minutes
+
+All team present
+
+ODE solver, not broken as before but not correct. 
+Fractmentation was turned off because its not working. 
+
+Creating analytical solution for comparison with tests
+
+Aim for today-
+Fix the program without burst alttiude
+Implement burst altitude 
+
+Mike - Creating tests
+Laura - Fixing ODE to give correct results
+Ollie - Implementing compulsorary functionality
+        Looking into whether inbuilt functionality
+        for peicewise ODE solver
+Hameed - Implementing analytical solution
+Sanaz - Begin Jupyter Notebook
+
+Potential other tasks 
+- Find good boundary case values
+- Research standard values for asteroid strength etc. 
+- How to switch between constant radius and expanding 
+when the tensile strength is exceeeded. Either look into
+whether there is inbuilt functionality within the Scipy 
+function. Or can run once, find the point where the 
+tensile strength is exceeded and then rerun the solver
+from that point using indexing. 
+- Before the burst occurs how can the asteroid keep the
+same radius and still lose mass at the same rate as before.
+The mass change should be zero prior to burst.
+- 
+
+Questions for Gareth
+- Should we make a crater? When should we stop
+- Need to know what the situation is regarding mass
+prior to burst
