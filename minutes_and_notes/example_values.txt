@@ -1,0 +1,20 @@
+Example Test Parameters
+v=[11,45]
+d=[0,100]
+
+Chelyabinsk/Tunguska
+KE[Mt]=0.55,9.4 = ... J
+d[m]=19.5,50
+rho[kg m-3]=3.3E3,3.E3
+v[m s]=19E3,20E3
+theta[deg]=20,45
+Y[MPa]=2,1=...Pa (careful with SI units, Pa=N/mm^2?)
+
+Ablation Parameters KH=1.4*10-8kg/J
+Cd=2
+H=8.E3
+p0=1.22kg/m3
+
+
+
+
