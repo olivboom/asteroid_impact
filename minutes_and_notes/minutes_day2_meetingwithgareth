@@ -1,0 +1,13 @@
+Meeting with Gareth on Day 2 
+
+- If we consider the asteroid to be a cylinder, the unchanging density and radius when mass is decreased due to ablation makes sense.
+  - It's up to us if we want to use a sphere instead but we should justify what we do 
+  - The results will be different to theirs if we do but the code is not automatically tested
+
+- Confirmed we are not looking at potential energy
+- v is always measured along axis of motion so it's kind of like "speed"
+
+- Github project management:
+  - Might be useful to take a look at "milestones" and the "issue tracker"
+  - Never push to master, everyone should have their own branches
+  - Perform pull requests when you add changes to the master branch
