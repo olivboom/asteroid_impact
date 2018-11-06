@@ -73,7 +73,6 @@ def inital_parameter():
     R_E = 6.371e6
     g_E = 9.81
 
-
 def initial_variables():
     """
     Creating the initial conditions for the quantities
@@ -107,7 +106,8 @@ def initial_variables():
     theta_init = 20 * np.pi / 180
     z_init = 100e3
     x_init = 0
-    r_init = 19.5
+    r_init = 19.5/2
+    h_init = 2
     return np.array([v_init,
                      m_init,
                      theta_init,
@@ -115,6 +115,8 @@ def initial_variables():
                      x_init,
                      r_init])
 
+def geth(r,m,rho_m):
+    return m/(np.pi*r**2*rho_m)
 
 def ke(m, v):
     return 0.5 * m * v ** 2
@@ -149,12 +151,14 @@ def area(r):
     return np.pi * r ** 2
 
 
-def volume(r):
-    return 4 / 3 * np.pi * r ** 3
+def volume(r, h):
+    return np.pi*r**2*h
 
 
 def dr(z, m, r):
-    return 7 / 2 * alpha * rho_a(z) / (m / volume(r))
+    rho_init = 3.3E3
+    h=geth(r,m,rho_init)
+    return 7 / 2 * alpha * rho_a(z) / (m / volume(r,h))
 
 
 def density(m,r):
@@ -208,28 +212,89 @@ def ode_solver(t, state):
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
-    f[5] = dr(z, m, r)
+    f[5] = 0
     return f
 
-
+	
+	
+def ode_solver_burst(t, state):
+    f = np.zeros_like(state)
+    v, m, theta, z, x, r = state
+    f[0] = dv(z, r, v, theta, m)
+    f[1] = dm(z, r, v)
+    f[2] = dtheta(theta, v, z, m, r)
+    f[3] = dz(theta, v)
+    f[4] = dx(theta, v, z)
+    f[5] = dr(z, m, r)
+    return f
+'''
+def improved_euler(f, u0, t0, t_max, dt):
+    u = np.array(u0)
+    t = np.array(t0)
+    u_all = [u0]
+    t_all = [t0]
+    #f[5] = dr(z, m, r)
+    while t < t_max:
+        ue = u + dt*f(t, u)  # euler guess
+        u = u + 0.5*dt* ( f(t, u) + f(t + dt, ue) )
+        u_all.append(u)
+        t = t + dt
+        t_all.append(t)
+    return np.array(u_all), np.array(t_all)
+'''
+	
 def main():
     inital_parameter()
-    state0 = initial_variables()
+    state = initial_variables()
     dt = 0.1
     t = np.arange(0.0, 40.0, dt)
 
     # =============================================================================
     #     SOLVE_IVP
     # =============================================================================
-
-    states = solve_ivp(ode_solver, (0, 50), state0, t_eval=t, method='RK45')  # need to fix the f tomorrow
+    i=0
+    #states = solve_ivp(ode_solver, (0, 50), state0, t_eval=t, method='RK45')  # need to fix the f tomorrow
+    v=[state[0]]
+    m=[state[1]]
+    theta=[state[2]]
+    z=[state[3]]
+    x=[state[4]]
+    KE=[0.5*v[-1]**2*m[-1]]
+    r=[state[5]]
+    Y=5E6
+    
+    #while t[i]<t[-1]:
+    while t[i]<t[-1]:
+        if Y>rho_a(z[-1])*v[-1]**2:
+            state_e = state + dt*ode_solver(t[i], state)  # euler guess
+            state = state + 0.5*dt* (ode_solver(t[i], state) + ode_solver(t[i+1], state_e) )
+            v.append(state[0])
+            m.append(state[1])
+            theta.append(state[2])
+            z.append(state[3])
+            x.append(state[4])
+            KE.append(0.5 * m[-1] * v[-1] ** 2)
+            r.append(state[5])
+        else:
+            state_e = state + dt*ode_solver_burst(t[i], state)  # euler guess
+            state = state + 0.5*dt* (ode_solver_burst(t[i], state) + ode_solver_burst(t[i+1], state_e) )
+            v.append(state[0])
+            m.append(state[1])
+            theta.append(state[2])
+            z.append(state[3])
+            x.append(state[4])
+            KE.append(0.5 * m[-1] * v[-1] ** 2)
+            r.append(state[5])            
+        i+=1
+    '''
     v = states.y[0]
     m = states.y[1]
     theta = states.y[2]
     z = states.y[3]
     x = states.y[4]
     r = states.y[5]
-    KE = 0.5 * m * v ** 2
+	'''
+    #KE = 0.5 * m * v ** 2
 
     plt.figure()
     plt.subplot(311)
@@ -242,10 +307,13 @@ def main():
     plt.plot
 
     plt.subplot(313)
-    plt.ylabel("Energy")
-    plt.xlabel("Time")
+    plt.ylabel("Altitude")
+    plt.xlabel("Energy_Loss")
 
-    plt.plot(t, KE)
+
+    KE_diff=np.diff(KE)
+    z_diff=np.diff(z)
+    plt.plot(abs(KE_diff/(4.18E12)/z_diff), np.array(z[:-1]))
     plt.show()
 
     # states = odeint(ode_solver, state0, t, tfirst=True)
