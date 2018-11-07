@@ -50,3 +50,13 @@ It is speed not velocity that is used to measure KE.
 Feedback from Gareth
 - Should use branches and pull requests as opposed to 
 merging directly to the master in order to improve workflow.
+
+
+Problems to be resolved
+- Are we happy with using the Euler method instead of events.
+Should be fine if performance isnt too much worst.
+- Need to find the differential equations for height and
+rho post-burst.
+- Need to write common sense pytests
+- Analytical solution is too low and not sure why
+- Read through hills paper
