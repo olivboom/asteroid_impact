@@ -1,0 +1,29 @@
+Afternoon meeting
+
+Present for meeting: Mike, Hamed, Sanaz, Oliver
+
+A lot of progress made.
+
+- Analytical solution completed
+- Solve_imp implemented
+- Cherbynsk mostly done, double check comparing energy specifically
+
+To-Do
+
+- Quantification of errors for analytical function - Mike & Hamed
+- Quantification of errors for numerical function -  Mike & Hamed
+- Packaging up file
+- Determining how to handle inputs
+- Justifications of methods                          Sanaz
+- Pytests                                             
+- Travis  not working so need manual review
+- Need to add plots for                              Ollie
+      - Mass vs Altitude                              
+      - Diameter vs Altitude *Not radius!*
+- Comparison of numerical solution using analytical assumptions Ollie
+- Layup of analytical solution on top of numerical solution     Ollie
+
+For the Optional exercises
+- Statistical ensemble
+- Mars tabulated data                                           Ollie
+
