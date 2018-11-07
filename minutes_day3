@@ -1,0 +1,28 @@
+Meeting Day 3
+
+All team members present
+
+Values are off for solutions using improved Euler
+Could be either method, underlying equations or wrong inputs
+- Wrong method - could try solve_ivp again. But unlikely to 
+be so far out
+- Underlying equations - have been checked regularly but
+could recheck
+- Wrong inputs - Go over known test cases to see if actually out
+
+What are actually out by?
+- Kinetic energy - factor of 2 - 200 depending on initial case
+- Burst altitude - actually looks correctish
+
+Want to put in case for Cherybynsk to see how far out the
+different factors are
+
+Analytical solution 
+- Shape correct but out by a factor of 1e7
+
+Tasks 
+Mike - Go and recreate Cherybynsk using exact data then
+compare with our solutions
+Hamed - Rework analytical solution to find out factor out by
+Ollie - Go and try and redo solve_ivp using Mikes latest code
+Sanaz - Pair with Hamed to go through analytical solution
