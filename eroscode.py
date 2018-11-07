@@ -71,10 +71,11 @@ def inital_parameter():
 def deg_to_rad(deg):
     return deg*np.pi/ 180
 
-
+    
 def rad_to_degrees(rad):
     return rad*180/np.pi
 
+    
 def initial_variables():
     """
     Creating the initial conditions for the quantities
@@ -103,9 +104,9 @@ def initial_variables():
         The initial condition for the radius of the asteroid
     """
 
-    v_init = 19e3
-    m_init = 1e3
-    theta_init = deg_to_rad(20)
+    v_init = 19.2e3
+    m_init = 12e6
+    theta_init = deg_to_rad(18.3)
     z_init = 100e3
     x_init = 0
     r_init = 19.5/2
@@ -156,10 +157,8 @@ def volume(r, h):
     return np.pi*r**2*h
 
 
-def dr(z, m, r):
-    h=geth(r,m)
-    return 7 / 2 * alpha * rho_a(z) / (m / volume(r,h))
-
+def dr(z, m, r,v ):
+    return np.sqrt(7 / 2 * alpha * rho_a(z) / rho_m)*v
 
 def density(m,r):
     return m/volume(r)	
@@ -215,7 +214,7 @@ def ode_solver_burst(t, state):
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
-    f[5] = dr(z, m, r)
+    f[5] = dr(z, m, r,v)
     return f
 '''
 def improved_euler(f, u0, t0, t_max, dt):
@@ -236,67 +235,7 @@ def improved_euler(f, u0, t0, t_max, dt):
 def efun(x, a, b, c):
     return a*np.exp(-b*x)+c
 
-def ebound(x,S,a,b,c):
-    return S-a*np.exp(-b*x)+c
-    
-def main():
-    inital_parameter()
-    state = initial_variables()
-    t0=0
-    tmax=40.
-    dt = 0.1
-    t = np.arange(t0, tmax, dt)
-    # =============================================================================
-    #     SOLVE_IVP
-    # =============================================================================
-    i=0
-    #states = solve_ivp(ode_solver, (0, 50), state0, t_eval=t, method='RK45')  # need to fix the f tomorrow
-    v=[state[0]]
-    m=[state[1]]
-    theta=[state[2]]
-    z=[state[3]]
-    x=[state[4]]
-    KE=[0.5*v[-1]**2*m[-1]]
-    r=[state[5]]
-    h=[geth(r[-1],m[-1])]
-    Y=5E6
-    
-    #while t[i]<t[-1]:
-    while t[i]<t[-1]:
-        if Y>rho_a(z[-1])*v[-1]**2:
-            state_e = state + dt*ode_solver(t[i], state)  # euler guess
-            state = state + 0.5*dt* (ode_solver(t[i], state) + ode_solver(t[i+1], state_e) )
-            v.append(state[0])
-            m.append(state[1])
-            theta.append(state[2])
-            z.append(state[3])
-            x.append(state[4])
-            KE.append(0.5 * m[-1] * v[-1] ** 2)
-            r.append(state[5])
-            h.append(geth(r[-1],m[-1]))
-        else:
-            state_e = state + dt*ode_solver_burst(t[i], state)  # euler guess
-            state = state + 0.5*dt* (ode_solver_burst(t[i], state) + ode_solver_burst(t[i+1], state_e) )
-            v.append(state[0])
-            m.append(state[1])
-            theta.append(state[2])
-            z.append(state[3])
-            x.append(state[4])
-            KE.append(0.5 * m[-1] * v[-1] ** 2)
-            r.append(state[5])  
-            h.append(h[-1])
-            #rho_m.append(m[-1]/volume(r[-1],h[-1]))
-        i+=1
-    '''
-    v = states.y[0]
-    m = states.y[1]
-    theta = states.y[2]
-    z = states.y[3]
-    x = states.y[4]
-    r = states.y[5]
-	'''
-    #KE = 0.5 * m * v ** 2
-
+def plot(t,v,z,KE):
     fig = plt.figure(figsize=(8,15))
     fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.7)
     
@@ -329,15 +268,73 @@ def main():
     ax3.axhline(y=z_burst,color='r', linestyle='--',linewidth=1)
     ax3.axvline(x=KE_unit.max(),color='r', linestyle='--',linewidth=1)
     ax3.annotate('{:.2E}'.format(z_burst),xy=(0,z_burst+0.5),color='r')
-    ax3.annotate('{:.2E}'.format(KE_unit.argmax()),xy=(KE_unit.max()+KE_unit.max()/100,z_burst-z_burst/20),color='r',rotation=90)
+    ax3.annotate('{:.2E}'.format(KE_unit.argmax()),xy=(KE_unit.max()+KE_unit.max()/100,z_burst+z_burst),color='r',rotation=90)
     #z_ana_diff,KE_ana_diff=plot()
     #ax3.plot(z_ana_diff,KE_ana_diff)# need to lay analytical solution on top!
     plt.show()
+    
+def main():
+    inital_parameter()
+    state = initial_variables()
+    t0=0
+    tmax=40.
+    dt = 0.1
+    t = np.arange(t0, tmax, dt)
+    # =============================================================================
+    #     SOLVE_IVP
+    # =============================================================================
+    i=0
+    #states = solve_ivp(ode_solver, (0, 50), state0, t_eval=t, method='RK45')  # need to fix the f tomorrow
+    v=[state[0]]
+    m=[state[1]]
+    theta=[state[2]]
+    z=[state[3]]
+    x=[state[4]]
+    KE=[0.5*v[-1]**2*m[-1]]
+    r=[state[5]]
+    #h=[geth(r[-1],m[-1])]
+    Y=2E6
+    
+    #while t[i]<t[-1]:
+    while t[i]<t[-1]:
+        if Y>rho_a(z[-1])*v[-1]**2:
+            state_e = state + dt*ode_solver(t[i], state)  # euler guess
+            state = state + 0.5*dt* (ode_solver(t[i], state) + ode_solver(t[i+1], state_e) )
+            v.append(state[0])
+            m.append(state[1])
+            theta.append(state[2])
+            z.append(state[3])
+            x.append(state[4])
+            KE.append(0.5 * m[-1] * v[-1] ** 2)
+            r.append(state[5])
+            #h.append(geth(r[-1],m[-1]))
+        else:
+            state_e = state + dt*ode_solver_burst(t[i], state)  # euler guess
+            state = state + 0.5*dt* (ode_solver_burst(t[i], state) + ode_solver_burst(t[i+1], state_e) )
+            v.append(state[0])
+            m.append(state[1])
+            theta.append(state[2])
+            z.append(state[3])
+            x.append(state[4])
+            KE.append(0.5 * m[-1] * v[-1] ** 2)
+            r.append(state[5])  
+            #h.append(h[-1])
+            #rho_m.append(m[-1]/volume(r[-1],h[-1]))
+        i+=1
+    '''
+    v = states.y[0]
+    m = states.y[1]
+    theta = states.y[2]
+    z = states.y[3]
+    x = states.y[4]
+    r = states.y[5]
+	'''
+    plot(t,v,z,KE)
+    #KE = 0.5 * m * v ** 2
 
     # states = odeint(ode_solver, state0, t, tfirst=True)
     # graph_plot(t, states)
-
-
+    
 main()
 # if __name__ == "main":
 #     main()
