@@ -157,7 +157,7 @@ def volume(r, h):
 
 def dr(z, m, r):
     h=geth(r,m)
-    return 7 / 2 * alpha * rho_a(z) / (m / volume(r, h))
+    return np.sqrt(7 / 2 * alpha * rho_a(z) / (m / volume(r, h))) * v
 
 
 def density(m,r):
@@ -283,4 +283,3 @@ def main():
 
 
 main()
-
