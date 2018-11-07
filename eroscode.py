@@ -1,9 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
-import matplotlib.ticker as ticker
-import matplotlib as mpl
-import pylab as plb
 from scipy.optimize import curve_fit
 
 def inital_parameter():
@@ -243,9 +240,6 @@ def ode_solver_post_burst(t, state):
     f[5] = dr(z, m, r)
     return f
 
-# def event(t, state):
-#     return (rho_a(state[3]) * state[0] ** 2) - Y
-# event.terminal = True
 
 def main():
     inital_parameter()
@@ -263,7 +257,11 @@ def main():
     z = np.array(states.y[3])
     tensile_stress = rho_a(z) * v ** 2
     burst_index = np.argmax(tensile_stress > Y)  # need to have a case for if yield strength is not exceeded
-
+    if burst_index == 0:
+        print('Cratering Event')
+    else:
+        print('Airburst Event')
+        
     t_new = t[burst_index]
     t2 = np.arange(t_new, tmax, dt)
     state0 = states.y[:, burst_index]
