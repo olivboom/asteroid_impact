@@ -1,13 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
-
-
-# from scipy.integrate import odeint
-
-# the issue is that the velocity is falling off too quickly
-# should be decreasing inverse exponentially
-
+import matplotlib.ticker as ticker
+import matplotlib as mpl
+import pylab as plb
+from scipy.optimize import curve_fit
 
 def inital_parameter():
     """
@@ -24,12 +21,8 @@ def inital_parameter():
     C_H : float, W/(m**2*K)
         The heat transfer coefficient
 
-    Q : float, K*s/W  
+    Q : float, J/kg
         The heat of ablation constant
-		# consider unit equation for:
-		# dm/dt=(-C_H * rho_a(z) * area(r) * v ** 3) / (2 * Q)
-	    # [kg/s]=[W/(K*m**2)]*[kg/m**3]*[m**2]*[m**3/s**3]/{Q}
-        # -> {Q}=[K*s]/[W]
 
     C_L : float, dimensionless
         The coefficient of lift
@@ -62,6 +55,7 @@ def inital_parameter():
     global rho_0
     global R_E
     global g_E
+    global rho_m
 
     C_D = 1.0
     C_H = 0.1
@@ -72,6 +66,14 @@ def inital_parameter():
     rho_0 = 1.2
     R_E = 6.371e6
     g_E = 9.81
+    rho_m=3.3E3
+    
+def deg_to_rad(deg):
+    return deg*np.pi/ 180
+
+
+def rad_to_degrees(rad):
+    return rad*180/np.pi
 
 def initial_variables():
     """
@@ -102,12 +104,11 @@ def initial_variables():
     """
 
     v_init = 19e3
-    m_init = 1000
-    theta_init = 20 * np.pi / 180
+    m_init = 1e3
+    theta_init = deg_to_rad(20)
     z_init = 100e3
     x_init = 0
     r_init = 19.5/2
-    h_init = 2
     return np.array([v_init,
                      m_init,
                      theta_init,
@@ -115,7 +116,7 @@ def initial_variables():
                      x_init,
                      r_init])
 
-def geth(r,m,rho_m):
+def geth(r,m):
     return m/(np.pi*r**2*rho_m)
 
 def ke(m, v):
@@ -156,27 +157,17 @@ def volume(r, h):
 
 
 def dr(z, m, r):
-    rho_init = 3.3E3
-    h=geth(r,m,rho_init)
+    h=geth(r,m)
     return 7 / 2 * alpha * rho_a(z) / (m / volume(r,h))
 
 
 def density(m,r):
     return m/volume(r)	
-	
-	
+
+
 def mass(rho,r):
     return rho*volume(r)
-	
 
-def deg_to_rad(deg):
-    return deg*np.pi/ 180
-
-	
-def rad_to_degrees(rad):
-    return rad*180/np.pi
-	
-	
 def graph_plot(t, states):
     plt.plot(t, states[:, 0])
     plt.xlabel('Time (s)')
@@ -215,8 +206,7 @@ def ode_solver(t, state):
     f[5] = 0
     return f
 
-	
-	
+
 def ode_solver_burst(t, state):
     f = np.zeros_like(state)
     v, m, theta, z, x, r = state
@@ -242,13 +232,20 @@ def improved_euler(f, u0, t0, t_max, dt):
         t_all.append(t)
     return np.array(u_all), np.array(t_all)
 '''
-	
+
+def efun(x, a, b, c):
+    return a*np.exp(-b*x)+c
+
+def ebound(x,S,a,b,c):
+    return S-a*np.exp(-b*x)+c
+    
 def main():
     inital_parameter()
     state = initial_variables()
+    t0=0
+    tmax=40.
     dt = 0.1
-    t = np.arange(0.0, 40.0, dt)
-
+    t = np.arange(t0, tmax, dt)
     # =============================================================================
     #     SOLVE_IVP
     # =============================================================================
@@ -261,6 +258,7 @@ def main():
     x=[state[4]]
     KE=[0.5*v[-1]**2*m[-1]]
     r=[state[5]]
+    h=[geth(r[-1],m[-1])]
     Y=5E6
     
     #while t[i]<t[-1]:
@@ -275,6 +273,7 @@ def main():
             x.append(state[4])
             KE.append(0.5 * m[-1] * v[-1] ** 2)
             r.append(state[5])
+            h.append(geth(r[-1],m[-1]))
         else:
             state_e = state + dt*ode_solver_burst(t[i], state)  # euler guess
             state = state + 0.5*dt* (ode_solver_burst(t[i], state) + ode_solver_burst(t[i+1], state_e) )
@@ -284,7 +283,9 @@ def main():
             z.append(state[3])
             x.append(state[4])
             KE.append(0.5 * m[-1] * v[-1] ** 2)
-            r.append(state[5])            
+            r.append(state[5])  
+            h.append(h[-1])
+            #rho_m.append(m[-1]/volume(r[-1],h[-1]))
         i+=1
     '''
     v = states.y[0]
@@ -296,24 +297,41 @@ def main():
 	'''
     #KE = 0.5 * m * v ** 2
 
-    plt.figure()
-    plt.subplot(311)
-    plt.plot(t, z)
-    plt.ylabel("Height")
+    fig = plt.figure(figsize=(8,15))
+    fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.7)
+    
+    #fig1=plt.subplot(311)
+    ax1 = fig.add_subplot(311)
+    ax1.plot(t, np.array(z)/1e3)
+    ax1.set_xlabel("Time[s]")
+    ax1.set_ylabel("Altitude[km]")
 
-    plt.subplot(312)
-    plt.ylabel("Speed")
-    plt.plot(t, v)
-    plt.plot
-
-    plt.subplot(313)
-    plt.ylabel("Altitude")
-    plt.xlabel("Energy_Loss")
-
-
+    popt, pcov = curve_fit(efun, t, np.array(z)/1e3,p0=(1, 1e-6, 1))
+    yy = efun(t, *popt)
+    ax1.plot(t,yy,'--r',label='{:.2f}*exp(-{:.2f}x)+{:.2f}'.format(popt[0],popt[1],popt[2]))
+    ax1.legend()
+    
+    ax2=fig.add_subplot(312)
+    ax2.set_xlabel("Speed[km/s]")
+    ax2.set_ylabel("Altitude[km]")
+    ax2.plot(np.array(v)/1e3,np.array(z)/1e3)
+    ax2.set_xlim(ax2.get_xlim()[::-1])
+    
+    ax3=fig.add_subplot(313)
+    ax3.set_ylabel("Altitude[km]")
+    ax3.set_xlabel("Energy_Loss[kt/km]")
     KE_diff=np.diff(KE)
     z_diff=np.diff(z)
-    plt.plot(abs(KE_diff/(4.18E12)/z_diff), np.array(z[:-1]))
+    KE_unit=abs(KE_diff/z_diff)*1e3/4.18E12
+    ax3.plot(KE_unit, np.array(z[:-1])/1e3)
+    #ax3.axhline(y=z[KE_unit.argmax()]/1e3, xmin=KE_unit[0], xmax=KE_unit[-1],color='r', linestyle='--',linewidth=0.5)
+    z_burst=z[KE_unit.argmax()]/1e3
+    ax3.axhline(y=z_burst,color='r', linestyle='--',linewidth=1)
+    ax3.axvline(x=KE_unit.max(),color='r', linestyle='--',linewidth=1)
+    ax3.annotate('{:.2E}'.format(z_burst),xy=(0,z_burst+0.5),color='r')
+    ax3.annotate('{:.2E}'.format(KE_unit.argmax()),xy=(KE_unit.max()+KE_unit.max()/100,z_burst-z_burst/20),color='r',rotation=90)
+    #z_ana_diff,KE_ana_diff=plot()
+    #ax3.plot(z_ana_diff,KE_ana_diff)# need to lay analytical solution on top!
     plt.show()
 
     # states = odeint(ode_solver, state0, t, tfirst=True)
