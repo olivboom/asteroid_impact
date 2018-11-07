@@ -1,4 +1,5 @@
 import eroscode.py
+import numpy as np
 
 def find_nearest(array,value):
     idx = np.searchsorted(array, value, side="left")
