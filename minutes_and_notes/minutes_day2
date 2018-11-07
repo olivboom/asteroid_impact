@@ -35,5 +35,28 @@ The mass change should be zero prior to burst.
 
 Questions for Gareth
 - Should we make a crater? When should we stop
+Stop when reaches the ground.
 - Need to know what the situation is regarding mass
 prior to burst
+Can make other assumptinos but needs to be well justified.
+He makes the assumption that the asteroid is a cylinder.
+Should change from spherical to cylinder
+- Do we only need to look at KE when it comes to calculating
+energy loss
+Only look at KE not at PE
+- Is the KE measured using speed or velocity. 
+It is speed not velocity that is used to measure KE.
+
+Feedback from Gareth
+- Should use branches and pull requests as opposed to 
+merging directly to the master in order to improve workflow.
+
+
+Problems to be resolved
+- Are we happy with using the Euler method instead of events.
+Should be fine if performance isnt too much worst.
+- Need to find the differential equations for height and
+rho post-burst.
+- Need to write common sense pytests
+- Analytical solution is too low and not sure why
+- Read through hills paper
