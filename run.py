@@ -7,31 +7,12 @@ import numpy as np
 #set parameters
 def run():
     initialisation.set_parameters("Earth", analytical=True)
-    initialisation.set_variables("Tunguska")
+    initialisation.set_variables("Ensemble")
     eroscode.main()
     return eroscode.final_state
 
 data = run()
 
-def find_ke_max(data):
-    t, v,m,theta, z,x, KE,r, burst_index, airburst_event = data
-    
-    z_diff = np.diff(z)
-    z_diff = np.append(z_diff,z_diff[-1])
-    
-
-
-    KE_km_kT = np.diff(KE)/np.diff(z/1000)/4.184e12
-    KE_km_kT = np.append(KE_km_kT,KE_km_kT[-1])
-
-    ke_max_value = KE_km_kT.max()
-    max_index = np.argmax(KE_km_kT == ke_max_value)
-    print(max_index)
-    ke_max_height = z[np.argmax(KE_km_kT == ke_max_value)]
-    print(ke_max_value)
-    print(ke_max_value, ke_max_height)   
-    plt.plot(KE_km_kT,z)
-    return KE_km_kT,z
 
 unitke,z = find_ke_max(data)
 
