@@ -114,11 +114,9 @@ def efun(x, a, b, c):
     """
     return a*np.exp(-b*x)+c
 
+
 def find_ke_max(data):
     t, v, m, theta, z, x, ke, r, burst_index, airburst_event = data
-    
-    z_diff = np.diff(z)
-    z_diff = np.append(z_diff, z_diff[-1])
     ke_per_km = np.diff(ke) / np.diff(z/1000)/4.184e12
     ke_per_km = np.append(ke_per_km, ke_per_km[-1])
     ke_max_value = ke_per_km.max()
@@ -299,4 +297,4 @@ def main():
 
     final_state = t, v, m, theta, z, x, ke, r, burst_index, airburst_event
 
-    return final_state
+    return t, v, m, theta, z, x, ke, r, burst_index, airburst_event
