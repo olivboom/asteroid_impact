@@ -8,10 +8,11 @@ import numpy as np
 def run():
     initialisation.set_parameters("Earth", analytical=True)
     initialisation.set_variables("Tunguska")
+    t, v, m, theta, z, x, ke, r, burst_index, airburst_event = eroscode.main()
+    eroscode.plot(t, v, m, z, ke, r, burst_index)
     return eroscode.main()
 
 data = run()
-
 
 #unitke,z = find_ke_max(data)
 
