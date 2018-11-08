@@ -2,118 +2,45 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from scipy.optimize import curve_fit
+import initialisation
 
-def inital_parameter():
-    """
-    Creating the initial conditions for the quantities
-    that will be solved in the ODE solver
+global C_D 
+global C_H
+global Q
+global C_L
+global alpha
+global H
+global rho_0
+global R_E
+global g_E
+global rho_m
+global Y
 
-    Returns
-    -----------------
-    An array containing the following quantities
+global initial_state
+global analytical
+#global final_state
 
-    C_D  : float,  dimensionless
-        Coefficient of drag.
+C_D = None
+C_H = None
+Q = None
+C_L = None
+alpha = None
+H = None
+rho_0 = None
+R_E = None
+g_E = None
+rho_m=3.3E3
+Y = 2e6
 
-    C_H : float, W/(m**2*K)
-        The heat transfer coefficient
 
-    Q : float, J/kg
-        The heat of ablation constant
+initial_state = None
+analytical = False
 
-    C_L : float, dimensionless
-        The coefficient of lift
+#final_state = None
 
-    alpha : float, dimensionless
-        Dispersion coefficient
 
-    H : float, m
-        Atmospheric scale height
-
-    rho_0 : float, kg / m ** 3
-        Atmospheric density at sea level
-
-    R_E : float, m
-        The radius of the Earth
-
-    r : float, m
-        The radius of the asteroid
-
-    g_E : float, m / 2 ** 2
-        The acceleration due to gravity of the earth
-    """
-
-    global C_D
-    global C_H
-    global Q
-    global C_L
-    global alpha
-    global H
-    global rho_0
-    global R_E
-    global g_E
-    global rho_m
-    global Y
-
-    C_D = 1.0
-    C_H = 0.1
-    Q = 1E7
-    C_L = 1E-3
-    alpha = 0.3
-    H = 8e3
-    rho_0 = 1.2
-    R_E = 6.371e6
-    g_E = 9.81
-    rho_m=3.3E3
-    Y = 2E6
     
-def deg_to_rad(deg):
-    return deg*np.pi/ 180
 
-
-def rad_to_degrees(rad):
-    return rad*180/np.pi
-
-def initial_variables():
-    """
-    Creating the initial conditions for the quantities
-    that will be solved in the ODE solver
-
-    Returns
-    -----------------
-    An array containing the following quantities
-
-    v_init : float
-    The inital velocity
-
-    m_init : float
-        The intial mass
-
-    theta_init : float
-        The initial entry angle
-
-    z_init : float
-        The initial altitude that the asteroid is measured from
-
-    x_init : float
-        The initial condition zeroing the horizontal displacement ******** In which axes
-
-    r_init : float
-        The initial condition for the radius of the asteroid
-    """
-
-    v_init = 19e3
-    m_init = 12e6
-    theta_init = deg_to_rad(20)
-    z_init = 100e3
-    x_init = 0
-    r_init = 19.5/2
-    return np.array([v_init,
-                     m_init,
-                     theta_init,
-                     z_init,
-                     x_init,
-                     r_init])
 
 def geth(r,m):
     return m/(np.pi*r**2*rho_m)
@@ -135,11 +62,13 @@ def dz(theta, v):
 
 
 def dtheta(theta, v, z, m, r):
+#    print(theta, v, z, m, r, R_E)
     return (g_E * np.cos(theta) / v) - ((C_L * rho_a(z) * area(r) * v) /
                                         (2 * m)) - ((v * np.cos(theta)) / (R_E + z))
 
 
 def dx(theta, v, z):
+#    print("//////", theta, v,z, R_E)
     return (v * np.cos(theta)) / (1 + z / R_E)
 
 
@@ -155,7 +84,7 @@ def volume(r, h):
     return np.pi*r**2*h
 
 
-def dr(z, m, r):
+def dr(v, z, m, r):
     h=geth(r,m)
     return np.sqrt(7 / 2 * alpha * rho_a(z) / (m / volume(r, h))) * v
 
@@ -210,7 +139,6 @@ def plot(t, v, z, KE, burst_index):
     ax3.annotate('{:.2E}'.format(z_burst), xy=(0, 2 * z_burst), color='r')
     ax3.annotate('{:.2E}'.format(np.max(KE_unit)), xy=(KE_unit.max() + KE_unit.max() / 100, 8 * z_burst),
                  color='r', rotation=90)
-    print(KE_unit[burst_index], z[burst_index])
     ax3.annotate('*', xy=(KE_unit[burst_index], z[burst_index] / 1e3))
     # z_ana_diff,KE_ana_diff=plot()
     # ax3.plot(z_ana_diff,KE_ana_diff)# need to lay analytical solution on top!
@@ -222,28 +150,42 @@ def ode_solver_pre_burst(t, state):
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
+    if analytical == True:
+        f[1] = 0
+
+
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
     f[5] = 0
     return f
 
-
+#def settings(*vars):
+#    if x == None:
+        
 def ode_solver_post_burst(t, state):
     f = np.zeros_like(state)
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
+    if analytical == True:
+        f[1] = 0
+
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
-    f[5] = dr(z, m, r)
+    f[5] = dr(v, z, m, r)
     return f
 
 
 def main():
-    inital_parameter()
-    state0 = initial_variables()
+#    errors.set_parameters()
+#    initialisation.set_parameters("Earth")
+#    initialisation.set_variables("Tunguska")
+    
+    state0 = initial_state
+    print(state0)
+
     t0=0
     tmax=40.
     dt = 0.1
@@ -279,7 +221,23 @@ def main():
     r=solution[5]
 
     plot(t, v, z, KE, burst_index)
+    
+    global final_state
+    
+    print("C_D: ", C_D)
+    print("C_H: ", C_H)
+    print("Q: ", Q)
+    print("C_L: ", C_L)
+    print("alpha: ", alpha)
+    print("H: ", H)
+    print("R: ", R_E)
+    print("g:", g_E)
+    
+    print(analytical)
+
+    
+    final_state = t, v,m,theta, z,x, KE,r, burst_index
 
 
-
-main()
+#if __name__ == "__main__":
+#    a = main()

@@ -55,7 +55,7 @@ def initial_parameter():
     print("here")
 
     C_D = 1    
-    m = 12e3
+    m = 12e6
     A = np.pi * (19.5/2)**2
     Theta = 20 * (np.pi)/180
     H = 8000
@@ -113,4 +113,5 @@ def plot():
     plt.xlabel("KE (kT km^1)")
     plt.show()
     
-plot()
+if __name__ == "__main__":
+    plot()
