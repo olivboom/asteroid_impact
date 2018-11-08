@@ -253,8 +253,10 @@ def main():
     burst_index = np.argmax(tensile_stress > Y)  # need to have a case for if yield strength is not exceeded
     if burst_index == 0:
         print('Cratering Event')
+        airburst_event = False
     else:
         print('Airburst Event')
+        airburst_event = True
         
     t_new = t[burst_index]
     t2 = np.arange(t_new, tmax, dt)
