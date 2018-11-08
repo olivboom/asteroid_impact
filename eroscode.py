@@ -36,7 +36,7 @@ def rad_to_degrees(rad):
 
 global initial_state
 global analytical
-#global final_state
+global final_state
 
 C_D = None
 C_H = None
@@ -160,12 +160,12 @@ def find_ke_max(data):
 
     ke_max_value = KE_km_kT.max()
     max_index = np.argmax(KE_km_kT == ke_max_value)
-    print(max_index)
+#    print(max_index)
     ke_max_height = z[np.argmax(KE_km_kT == ke_max_value)]
-    print(ke_max_value)
-    print(ke_max_value, ke_max_height)   
-    plt.plot(KE_km_kT,z)
-    return KE_km_kT,z
+#    print(ke_max_value)
+#    print(ke_max_value, ke_max_height)   
+#    plt.plot(KE_km_kT,z)
+    return ke_max_value, ke_max_height
 
 
 def plot(t, v, m, z, KE, r, burst_index):
@@ -245,6 +245,7 @@ def ode_solver_pre_burst(t, state):
     exceed the tensile strength of the asteroid
     """
     f = np.zeros_like(state)
+#    print(state)
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
@@ -298,6 +299,7 @@ def main():
     """
     Place to execute the main code functions
     """
+    
     # Initialising parameters and variables
 
     # Determining the time step and range that will be analysed
@@ -318,10 +320,10 @@ def main():
     # And therefore if it is an airburst event
     burst_index = np.argmax(tensile_stress > Y)
     if burst_index == 0:
-        print('Cratering Event')
+#        print('Cratering Event')
         airburst_event = False
     else:
-        print('Airburst Event')
+#        print('Airburst Event')
         airburst_event = True
 
     # If the airburst occurs then rerun the ODEs from the

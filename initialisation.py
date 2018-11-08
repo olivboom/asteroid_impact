@@ -30,10 +30,10 @@ def asteroid_data():
 
 #def ensemble_data()
 
-def set_parameters(planet="Earth", analytical=False):
-    print("analytical: ", analytical)
+def set_parameters(planet="Earth", analytical_assumption=False):
+    print("analytical: ", analytical_assumption)
     
-    eroscode.analytical = analytical
+    eroscode.analytical = analytical_assumption
     eroscode.C_D = 1
     eroscode.C_H = 0.1
     eroscode.Q = 1E7
@@ -57,7 +57,7 @@ def set_parameters(planet="Earth", analytical=False):
         eroscode.H = 10800
         eroscode.rho_0 = 1.2 #find out true value
 
-    if analytical == True:
+    if analytical_assumption == True:
         eroscode.g_E = 0
         eroscode.R_E = np.inf
         eroscode.C_L = 0
@@ -85,7 +85,7 @@ def set_variables(name="Tunguska"):
 #        print("T")
         state_0 = Tunguska
         
-    if name == "Analytical":
+    if name == "Analytical Assumptions":
 #        print("a")
         state_0 = Analytical
         
@@ -97,11 +97,8 @@ def set_variables(name="Tunguska"):
         state_0 = se.confidence_prediction()
         
         
-
-        
-#    print("3", state_0)
     
-    eroscode.initial_state = state_0
+    return state_0
 #
 
 def set_variables_ensemble(variables):

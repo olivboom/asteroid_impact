@@ -4,61 +4,61 @@ import plotting_analytical
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+
+
+
+
 #set parameters
-def run():
-    initialisation.set_parameters("Earth", analytical=True)
-    initialisation.set_variables("Tunguska")
-    eroscode.main()
-    return eroscode.final_state
+def run(planet="Earth", asteroid = "Ensemble" ,analytical=False, ensemble=False):
+    final_states = []
+    KE = []
+    height = []
+    initialisation.set_parameters(planet, analytical_assumption=False)
+    if asteroid == "Ensemble":
+#        print("asdasd")
+        eroscode.ensemble = True
+#        print(asteroid)
+        states = initialisation.set_variables(asteroid)
+        print(states)
+        for n,i in enumerate(range(states.shape[1])):
+            if n%50 ==0:
+                print(n)
+            state = states[:,i]
+#            print(state)
+            eroscode.initial_state = state
+            eroscode.main()
+            data = eroscode.final_state
+            ke_max_value, ke_max_height = eroscode.find_ke_max(data)
+            KE.append(ke_max_value)
+            height.append(ke_max_height)
+            final_states.append(data)
+#            print(data)
+    else:
+        print("dasf")
+        state = initialisation.set_variables(asteroid)
+        eroscode.initial_state = state
+        eroscode.ensemble = False
+        eroscode.main()
+        data = eroscode.final_state
 
-data = run()
+    return final_states, KE, height
+
+final_states, KE, height = run()
+
+tuples = zip(KE,height)
+a = list(tuples)
+x,y = np.array(a)[:,0], np.array(a)[:,1]
+
+plt.plot(x,y,'.')
+plt.xlabel('KE')
 
 
-unitke,z = find_ke_max(data)
+#t, v,m,theta, z,x, ke,r, burst_index, airburst_event = run()
+#
+#eroscode.plot(t, v, m, z, ke, r, burst_index)
 
 
-#include assert to prevent misspelling
+#unitke,z = find_ke_max(data)
 
-#print("done")
-#
-#analytical_numerical = eroscode.final_state
-#
-#t, v,m,theta, z_1,x, KE_1,r, burst_index, airburst_event = analytical_numerical
-##np.abs(KE_diff/(z_diffp/1000)) /_1kT, z/1000
-#plt.figure()
-#
-#KE_2, z_2 = plotting_analytical.plot()
-#
-##plt.plot(KE_,z_)
-#
-#def plot(z, KE):
-#    
-#    v_diff = np.diff(v)
-#    v_diff = np.append(v_diff, v_diff[-1])
-#    
-#    z_diff = np.diff(z)
-#    z_diff = np.append(z_diff,z_diff[-1])
-#    
-#    _1kT = 4.184E12
-#    
-#    KE = (1/2 * m *v**2)
-#    KE_diff = np.diff(KE)
-#    KE_diff = np.append(KE_diff,KE_diff[-1])
-#    
-#    KE_unit = abs(KE_diff/z_diff) * 1e3/_1kT
-#    print(np.max(KE_unit))
-#    
-#    print(KE)
-#    
-#        
-#    plt.plot(np.abs(KE_diff/(z_diff/1000)) /_1kT, z/1000)
-#    plt.ylabel("Height above ground (m)")
-#    plt.xlabel("KE (kT km^1)")
-#    plt.ylim(bottom = 0)
-#    plt.show()
-#
-##
-##    plt.show()
-#plot(z_2,KE_2)
-##a, b = plotting_analytical.plot()
-#
+
