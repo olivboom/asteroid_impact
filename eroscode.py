@@ -22,6 +22,7 @@ global ensemble
 global initial_state
 global analytical
 global tol
+global final_state
 
 tol = None
 
@@ -110,12 +111,6 @@ def dr(v, z):
     return np.sqrt(7 / 2 * alpha * rho_a(z) / rho_m) * v
 
 
-def efun(x, a, b, c):
-    """
-    Overlays an exponential function onto the graph
-    of altitude versus time for visualisation purposes
-    """
-    return a*np.exp(-b*x)+c
 
 def find_ke_max(data):
     t, v, m, theta, z, x, ke, r, burst_index, airburst_event = data
@@ -126,77 +121,10 @@ def find_ke_max(data):
     ke_per_km = np.append(ke_per_km, ke_per_km[-1])
     ke_max_value = ke_per_km.max()
     ke_max_height = z[np.argmax(ke_per_km == ke_max_value)]
-    plt.plot(ke_per_km, z)
+#    plt.plot(ke_per_km, z)
     return ke_max_value, ke_max_height
 
 
-def plot(t, v, m, z, KE, r, burst_index):
-    """
-    Plots a series of graphs that are solutions to the
-    set of ODEs for given initial conditions.
-
-    Returns
-    -------------
-    Plot with subplots for
-    Time vs Altitude
-    Speed vs Altitude
-    Altiude vs Energy lost per unit height
-    Mass vs Altitude
-    Diameter vs Altitude
-    """
-
-    fig = plt.figure(figsize=(8, 15))
-    fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.7)
-
-    popt, pcov = curve_fit(efun, t, z / 1e3)
-    yy = efun(t, *popt)
-
-    ax1 = fig.add_subplot(321)
-    ax1.plot(t, z / 1e3)
-    ax1.set_xlabel("Time [s]")
-    ax1.set_ylabel("Altitude [km]")
-    ax1.plot(t, yy, '--r', label='{:.2f}*exp(-{:.2f}x)+{:.2f}'.format(popt[0], popt[1], popt[2]))
-    ax1.legend()
-    ax1.grid()
-
-    ax2 = fig.add_subplot(322)
-    ax2.set_xlabel("Speed [km/s]")
-    ax2.set_ylabel("Altitude [km]")
-    ax2.plot(v / 1e3, z / 1e3)
-    ax2.set_xlim(ax2.get_xlim()[::-1])
-    ax2.grid()
-
-    ax3 = fig.add_subplot(323)
-    ax3.set_ylabel("Altitude [km]")
-    ax3.set_xlabel("Energy_Loss [kt/km]")
-    ke_diff = np.diff(KE)
-    z_diff = np.diff(z)
-    ke_unit = abs(ke_diff / z_diff) * 1e3 / 4.18E12
-    ax3.plot(ke_unit, z[:-1] / 1e3)
-    ax3.grid()
-
-    ax4 = fig.add_subplot(324)
-    ax4.set_xlabel("Mass [kg]")
-    ax4.set_ylabel("Altitude [km]")
-    ax4.plot(m / 1e3, z / 1e3)
-    ax4.set_xlim(ax4.get_xlim()[::-1])
-    ax4.grid()
-
-    ax5 = fig.add_subplot(325)
-    ax5.set_xlabel("Diameter [m]")
-    ax5.set_ylabel("Altitude [km]")
-    ax5.plot((r * 2), z / 1e3)
-    ax5.set_xlim(ax5.get_xlim()[::-1])
-    ax5.grid()
-
-    z_burst = z[ke_unit.argmax()] / 1e3
-    ax3.axhline(y=z_burst, color='r', linestyle='--', linewidth=1)
-    ax3.axvline(x=ke_unit.max(), color='r', linestyle='--', linewidth=1)
-    ax3.annotate('{:.2E}'.format(z_burst), xy=(0, 2 * z_burst), color='r')
-    ax3.annotate('{:.2E}'.format(np.max(ke_unit)), xy=(ke_unit.max() + ke_unit.max() / 100, 8 * z_burst),
-                 color='r', rotation=90)
-    ax3.annotate('*', xy=(ke_unit[burst_index], z[burst_index] / 1e3))
-    plt.show()
 
 
 def ode_solver_pre_burst(t, state):
@@ -207,6 +135,7 @@ def ode_solver_pre_burst(t, state):
     exceed the tensile strength of the asteroid
     """
     f = np.zeros_like(state)
+#    print(state)
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
@@ -251,6 +180,7 @@ def main():
     """
     Place to execute the main code functions
     """
+    
     # Initialising parameters and variables
 
     # Determining the time step and range that will be analysed
@@ -271,10 +201,10 @@ def main():
     # And therefore if it is an airburst event
     burst_index = np.argmax(tensile_stress > Y)
     if burst_index == 0:
-        print('Cratering Event')
+#        print('Cratering Event')
         airburst_event = False
     else:
-        print('Airburst Event')
+#        print('Airburst Event')
         airburst_event = True
 
     # If the airburst occurs then rerun the ODEs from the
