@@ -4,7 +4,7 @@ import eroscode
 
 #set parameters
 
-initialisation.set_parameters("Earth", True)
+initialisation.set_parameters("Earth", analytical=True)
 initialisation.set_variables("Analytical") #include assert to prevent misspelling
 
 print("done")

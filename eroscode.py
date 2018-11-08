@@ -62,7 +62,7 @@ def dz(theta, v):
 
 
 def dtheta(theta, v, z, m, r):
-#    print(theta, v, z, m, r, R_E)
+    print(theta, v, z, m, r, R_E)
     return (g_E * np.cos(theta) / v) - ((C_L * rho_a(z) * area(r) * v) /
                                         (2 * m)) - ((v * np.cos(theta)) / (R_E + z))
 
@@ -168,13 +168,15 @@ def ode_solver_post_burst(t, state):
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
-    if analytical == True:
-        f[1] = 0
 
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
     f[5] = dr(v, z, m, r)
+    if analytical == True:
+        f[1] = 0
+        f[5] = 0
+
     return f
 
 

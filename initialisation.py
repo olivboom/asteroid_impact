@@ -15,13 +15,16 @@ def deg_to_rad(deg):
 def rad_to_degrees(rad):
     return rad*180/np.pi
 
+
 def asteroid_data():
+    #ASTEROID = m_init,v_init, theta, z_init, x_init, r_init
     Tunguska = np.array([20e3, 11e6, deg_to_rad(45), 100e3, 0, 25 ])
     Analytical = np.array([19e3, 12e6, deg_to_rad(20), 100e3, 0, 9.75 ])
     Chelyabinsk = np.array([19e3, 12e6, deg_to_rad(20), 100e3, 0, 9.75 ])
+#    Fixed = np.array([m_init,v_init, theta, z_init, x_init, r_init])
+    Fixed = np.array([19e3, 15e6, deg_to_rad(20), 100e3, 0, 9.75])
     
-    
-    return Tunguska, Analytical, Chelyabinsk
+    return Tunguska, Analytical, Chelyabinsk, Fixed
 
 def set_parameters(planet="Earth", analytical=False):
     print("analytical: ", analytical)
@@ -72,7 +75,7 @@ def set_variables(name="Tunguska"):
     
     state_0 = [v_init, m_init, theta_init, 
                       z_init, x_init, r_init]
-    Tunguska, Analytical, Chelyabinsk = asteroid_data()
+    Tunguska, Analytical, Chelyabinsk, Fixed = asteroid_data()
 
 #
     if name == "Tunguska":
@@ -86,6 +89,11 @@ def set_variables(name="Tunguska"):
     if name == "Chelyabinsk":
         print("C")
         state_0 = Chelyabinsk
+        
+    if name == "Fixed":
+        print("F")
+        state_0 = Fixed
+
         
     print("3", state_0)
     
