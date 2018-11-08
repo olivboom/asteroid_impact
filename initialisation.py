@@ -8,6 +8,7 @@ Created on Wed Nov  7 16:48:56 2018
 import eroscode
 import numpy as np
 import statistical_ensemble as se
+import plotting_analytical
 
 def deg_to_rad(deg):
     return deg*np.pi/ 180
@@ -61,7 +62,34 @@ def set_parameters(planet="Earth", analytical_assumption=False):
         eroscode.g_E = 0
         eroscode.R_E = np.inf
         eroscode.C_L = 0
+
+def set_parameters_analytical_solution(planet="Earth"):
+    plotting_analytical.C_D = 1
+    plotting_analytical.C_H = 0.1
+    plotting_analytical.Q = 1E7
+    plotting_analytical.alpha = 0.3
+    plotting_analytical.g_E = 0
+    plotting_analytical.R_E = np.inf
+    plotting_analytical.C_L = 0
+
+    
+    
+    if planet == "Earth":
+        plotting_analytical.R_E = 6.371E6
+        plotting_analytical.H = 8000
+        plotting_analytical.rho_0 = 1.2
+
+
         
+    elif planet == "Mars":
+        plotting_analytical.R_E = 3390e3
+        plotting_analytical.H = 10800
+        plotting_analytical.rho_0 = 1.2 #find out true value
+        
+    
+
+
+set_parameters_analytical_solution(planet="Earth")
 
 
 
@@ -100,6 +128,9 @@ def set_variables(name="Tunguska"):
     
     return state_0
 #
+    
+def set_variables_custom(variables):
+    eroscode.initial_state = variables
 
 def set_variables_ensemble(variables):
     eroscode.initial_state = variables

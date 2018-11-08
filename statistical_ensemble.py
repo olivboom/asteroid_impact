@@ -15,7 +15,7 @@ import eroscode as er
 
 
 
-def confidence_prediction():
+def confidence_prediction(num):
     """
     This statistical analysis if for scenarios where the initial
     conditions of the asteroid are known but there is a lack of
@@ -41,9 +41,9 @@ def confidence_prediction():
     radius_sigma = 1
 
     n = 0
-    random_array = np.zeros((6, 100000))
+    random_array = np.zeros((6, num))
 
-    while n < 100000:
+    while n < num:
         random_array[0, n] = np.random.normal(velocity_mean, velocity_sigma, 1)  # velocity
         random_array[1, n] = np.random.normal(mass_mean, mass_sigma, 1)  # mass
         random_array[2, n] = np.random.normal(theta_mean, theta_sigma, 1)  # theta

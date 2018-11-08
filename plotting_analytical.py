@@ -4,72 +4,38 @@ Created on Tue Nov  6 09:30:14 2018
 
 @author: Hamed
 """
+
+import initialisation 
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-def initial_parameter():
-    """
-    Setting the parameters used in the analytical solution
-    to create the plot
+global C_D
+global m
+global A
+global Theta
+global H
+global rho_0
 
-    Returns
-    -----------------
-    An array containing the following quantities
-
-    C_D   : float,  dimensionless
-            Coefficient of drag.
-
-    m     : float, kg
-            Mass of asteroid
-
-    A     : float, m^2
-            Projected surface area of asteroid
-
-    Theta : float, radians
-            Angle of incidence into the atmosphere
-
-    H     : float, m
-            Atmospheric scale height
-
-    rho_0 : float, kg m^-3
-            Sea level atmospheric density
-
-    z_init : float, m
-             Asteroid starting height
-             
-    v_init : float ms^-1
-             Asteroid starting velocity
-
-    """
-    global C_D
-    global m
-    global A
-    global Theta
-    global H
-    global rho_0
-    global z_init
-    global v_init
-    global z_init_m
+global variables
+global z_init
+global v_init
 
 
-    print("here")
+#print(H)
 
-    C_D = 1    
-    m = 12e6
-    A = np.pi * (19.5/2)**2
-    Theta = 20 * (np.pi)/180
-    H = 8000
-    rho_0 = 1.2
-    z_init = 100e3
-    v_init = 19e3
+#H = None
+#print("H: ", H)
+def returnparameters():
+    return H,A,rho_0, Theta
 
 
-
-
-def plot():
-    initial_parameter()
+def analytical(variables):
+    
+    v_init, m_init, theta_init, z_init, x_init, r_init = variables
+    
     num = 100
-    z = np.linspace(z_init,0, num)
+#    z = np.linspace(z_init,0, num)
     
     #step = (z_init/num )
     #print(step)
@@ -115,5 +81,5 @@ def plot():
     
     return z, KE
     
-if __name__ == "__main__":
-    plot()
+#if __name__ == "__main__":
+#    analytical()
