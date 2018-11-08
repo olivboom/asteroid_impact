@@ -15,7 +15,26 @@ def run(tol):
     settolerance(tol)
     return eroscode.main()
 
-data = run(1E-5)
+
+def run_pre(tol):
+    ## without burst
+    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_variables("Chelyabinsk")
+    settolerance(tol)
+    return eroscode.main_pre()
+
+def run_radau():
+    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_variables("Chelyabinsk")
+    return eroscode.main_radau()
+
+def run_radau_pre():
+    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_variables("Chelyabinsk")
+    return eroscode.main_radau_pre()
+
+
+#data = run(1E-5)
 
 
 #unitke,z = find_ke_max(data)
