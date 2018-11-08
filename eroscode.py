@@ -17,6 +17,23 @@ global g_E
 global rho_m
 global Y
 
+def deg_to_rad(deg):
+    """
+    Returns an angle in radians
+    for a given angle in degrees
+    """
+    return deg*np.pi / 180
+
+
+def rad_to_degrees(rad):
+    """
+    Returns an angle in degrees
+    for a given angle in radians
+    """
+    return rad*180 / np.pi
+
+
+
 global initial_state
 global analytical
 #global final_state
@@ -45,7 +62,7 @@ ensemble = False
 initial_state = None
 analytical = False
 
-#final_state = None
+final_state = None
 
 
 def deg_to_rad(deg):
@@ -57,23 +74,33 @@ def rad_to_degrees(rad):
 
 
 
-
-
-
-
 def dv(z, r, v, theta, m):
+    """
+    The ODE describing the rate of change in velocity
+    """
     return (-C_D * rho_a(z) * area(r) * v ** 2) / (2 * m) + g_E * np.sin(theta)
 
 
 def rho_a(z):
+    """
+    Returns the density for a given altitude
+    """
     return rho_0 * np.exp(-z / H)
 
 
 def dz(theta, v):
+    """
+    The ODE describing the rate of change in altitude
+    """
     return -v * np.sin(theta)
 
 
 def dtheta(theta, v, z, m, r):
+    """
+    The ODE describing the rate of change in angle
+    of incidence relative to the horizon
+    """
+
     Term_1 = (g_E * np.cos(theta) /v)
     Term_2 = (C_L * rho_a(z) * area(r) * v)/(2*m)
     Term_3 = (v*np.cos(theta))/(R_E + z)
@@ -81,24 +108,43 @@ def dtheta(theta, v, z, m, r):
     return Term_1 - Term_2 - Term_3
 
 
+
+
 def dx(theta, v, z):
-#    print("//////", theta, v,z, R_E)
+    """
+    The ODE describing the rate of
+    change in horizontal distance
+    """
     return (v * np.cos(theta)) / (1 + z / R_E)
 
 
 def dm(z, r, v):
+    """
+    The ODE describing the rate of change of mass
+    """
     return (-C_H * rho_a(z) * area(r) * v ** 3) / (2 * Q)
 
 
 def area(r):
+    """
+    Returns the cross sectional area of a
+    circle for a given radius
+    """
     return np.pi * r ** 2
 
 
 def dr(v, z):
+    """
+    The ODE describing the rate of change of radius
+    """
     return np.sqrt(7 / 2 * alpha * rho_a(z) / rho_m) * v
 
 
 def efun(x, a, b, c):
+    """
+    Overlays an exponential function onto the graph
+    of altitude versus time for visualisation purposes
+    """
     return a*np.exp(-b*x)+c
 
 def find_ke_max(data):
@@ -123,6 +169,20 @@ def find_ke_max(data):
 
 
 def plot(t, v, m, z, KE, r, burst_index):
+    """
+    Plots a series of graphs that are solutions to the
+    set of ODEs for given initial conditions.
+
+    Returns
+    -------------
+    Plot with subplots for
+    Time vs Altitude
+    Speed vs Altitude
+    Altiude vs Energy lost per unit height
+    Mass vs Altitude
+    Diameter vs Altitude
+    """
+
     fig = plt.figure(figsize=(8, 15))
     fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.7)
 
@@ -178,6 +238,12 @@ def plot(t, v, m, z, KE, r, burst_index):
 
 
 def ode_solver_pre_burst(t, state):
+    """
+    The set of ordinary differential equations
+    describing the behavior of an asteroids
+    reentry given that the stresses on it does not
+    exceed the tensile strength of the asteroid
+    """
     f = np.zeros_like(state)
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
@@ -192,10 +258,15 @@ def ode_solver_pre_burst(t, state):
     f[5] = 0
     return f
 
-#def settings(*vars):
-#    if x == None:
         
 def ode_solver_post_burst(t, state):
+    """
+    The set of ordinary differential equations
+    describing the behavior of an asteroid
+    reentry given that the stresses on it does
+    exceed the tensile strength of the asteroid
+    """
+
     f = np.zeros_like(state)
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
@@ -218,91 +289,75 @@ KEs = []
 Heights = []
 def main():
     global ensemble
-#    errors.set_parameters()
-#    initialisation.set_parameters("Earth")
-#    initialisation.set_variables("Tunguska")
-    print(states)
-    
-    states = initial_state
-    print(len(states.shape), "states")
-    rows = 1
-    if len(states.shape) == 2:
-        ensemble = True
-        rows = states.shape[1]
-        print(rows, "rows")
 
     
-    if rows ==1:
-        states = [states]
+    state0 = initial_state
+    
+
         
-    for kasd in range(rows):
-        print(rows, "rows")
-        print("i", kasd)
-        if rows == 1:
-            state0 = states[0]
-        
-        else: 
-            state0 = states[:,kasd]
-        
-    
-        print("dim", state0.ndim)
-        
-        print(state0)
-    #    print(state0)
-    
-        t0=0
-        tmax=40.
-    
-        dt = 0.1
-        t = np.arange(t0, tmax, dt)
-    
-        states = solve_ivp(ode_solver_pre_burst, (0, 1.1 * tmax), state0, t_eval=t, method='RK45')
-    
-        # need to find index where breakup occurs
-    
-        v = np.array(states.y[0])
-        z = np.array(states.y[3])
-        tensile_stress = rho_a(z) * v ** 2
-        burst_index = np.argmax(tensile_stress > Y)  # need to have a case for if yield strength is not exceeded
-        if burst_index == 0:
-            print('Cratering Event')
-            airburst_event = False
-        else:
-            airburst_event = True
-            print('Airburst Event')
-            airburst_event = True
-            
+    """
+    Place to execute the main code functions
+    """
+    # Initialising parameters and variables
+
+    # Determining the time step and range that will be analysed
+    t0 = 0
+    tmax = 40.
+    dt = 0.1
+    t = np.arange(t0, tmax, dt)
+
+    # solving the ODE for pre-burst conditions using Runga Kutta 45
+    states = solve_ivp(ode_solver_pre_burst, (0, 1.1 * tmax), state0, t_eval=t, method='RK45')
+
+    # Calculating the stresses felt by the asteroid
+    v = np.array(states.y[0])
+    z = np.array(states.y[3])
+    tensile_stress = rho_a(z) * v ** 2
+
+    # Calculating if the tensile stresses exceed the yield strength
+    # And therefore if it is an airburst event
+    burst_index = np.argmax(tensile_stress > Y)
+    if burst_index == 0:
+        print('Cratering Event')
+        airburst_event = False
+    else:
+        print('Airburst Event')
+        airburst_event = True
+
+    # If the airburst occurs then rerun the ODEs from the
+    # Point of burst and concatenate the two ODE solutions
+    if airburst_event is True:
         t_new = t[burst_index]
         t2 = np.arange(t_new, tmax, dt)
         state0 = states.y[:, burst_index]
-    
-        states_2 = solve_ivp(ode_solver_post_burst, (t_new, 1.1 * tmax), state0, t_eval=t2, method='RK45')
-    
+
+        states_2 = solve_ivp(ode_solver_post_burst,
+                             (t_new, 1.1 * tmax), state0, t_eval=t2, method='RK45')
+
         solution = np.concatenate((states.y[:, 0:burst_index], states_2.y), axis=1)
+    else:
+        solution = states
+
+    # plotting the quantities of interest
+    v=solution[0]
+    m=solution[1]
+    theta=solution[2]
+    z=solution[3]
+    x=solution[4]
+    ke=0.5*v**2*m
+    r=solution[5]
     
-        v=solution[0]
-        m=solution[1]
-        theta=solution[2]
-        z=solution[3]
-        x=solution[4]
-        KE=0.5*v**2*m
-        r=solution[5]
+    ke_1diff = np.diff(ke)
+    z_1diff = np.diff(z)
+    ke_unit = abs(ke_1diff / z_1diff) * 1e3 / 4.18E12
     
-        ke_1diff = np.diff(KE)
-        z_1diff = np.diff(z)
-        ke_unit = abs(ke_1diff / z_1diff) * 1e3 / 4.18E12
+    max_ke = np.max(ke_unit)
+    global final_state
     
-        max_ke = np.max(ke_unit)
-        global final_state
-        
     
-        
-        final_state = t, v,m,theta, z,x, KE,r, burst_index, airburst_event
-        
-        KEs.append(find_ke_max(final_state)[0])
-        Heights.append(find_ke_max(final_state)[1])
-        
-        
+    
+    final_state = t, v,m,theta, z,x, ke,r, burst_index, airburst_event
+
 
 
 

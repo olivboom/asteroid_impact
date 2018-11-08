@@ -7,7 +7,7 @@ import numpy as np
 #set parameters
 def run():
     initialisation.set_parameters("Earth", analytical=True)
-    initialisation.set_variables("Ensemble")
+    initialisation.set_variables("Tunguska")
     eroscode.main()
     return eroscode.final_state
 
