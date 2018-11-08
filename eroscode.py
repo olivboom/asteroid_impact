@@ -21,6 +21,9 @@ global Heights
 global ensemble
 global initial_state
 global analytical
+global tol
+
+tol = None
 
 KEs = []
 Heights = []
@@ -114,9 +117,11 @@ def efun(x, a, b, c):
     """
     return a*np.exp(-b*x)+c
 
-
 def find_ke_max(data):
     t, v, m, theta, z, x, ke, r, burst_index, airburst_event = data
+    
+    z_diff = np.diff(z)
+    z_diff = np.append(z_diff, z_diff[-1])
     ke_per_km = np.diff(ke) / np.diff(z/1000)/4.184e12
     ke_per_km = np.append(ke_per_km, ke_per_km[-1])
     ke_max_value = ke_per_km.max()
@@ -255,7 +260,7 @@ def main():
     t = np.arange(t0, tmax, dt)
 
     # solving the ODE for pre-burst conditions using Runga Kutta 45
-    states = solve_ivp(ode_solver_pre_burst, (0, 1.1 * tmax), state0, t_eval=t, method='RK45')
+    states = solve_ivp(ode_solver_pre_burst, (0, 1.1 * tmax), state0, t_eval=t, method='RK45', atol=tol, rtol=tol)
 
     # Calculating the stresses felt by the asteroid
     v = np.array(states.y[0])
@@ -280,7 +285,7 @@ def main():
         state0 = states.y[:, burst_index]
 
         states_2 = solve_ivp(ode_solver_post_burst,
-                             (t_new, 1.1 * tmax), state0, t_eval=t2, method='RK45')
+                             (t_new, 1.1 * tmax), state0, t_eval=t2, method='RK45', atol=tol, rtol=tol)
 
         solution = np.concatenate((states.y[:, 0:burst_index], states_2.y), axis=1)
     else:
@@ -297,4 +302,4 @@ def main():
 
     final_state = t, v, m, theta, z, x, ke, r, burst_index, airburst_event
 
-    return t, v, m, theta, z, x, ke, r, burst_index, airburst_event
+    return final_state

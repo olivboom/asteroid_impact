@@ -4,15 +4,19 @@ import plotting_analytical
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+def settolerance(tol):
+    eroscode.tol = tol
+
 #set parameters
-def run():
+def run(tol):
     initialisation.set_parameters("Earth", analytical=True)
     initialisation.set_variables("Tunguska")
-    t, v, m, theta, z, x, ke, r, burst_index, airburst_event = eroscode.main()
-    eroscode.plot(t, v, m, z, ke, r, burst_index)
+    settolerance(tol)
     return eroscode.main()
 
-data = run()
+data = run(1E-5)
+
 
 #unitke,z = find_ke_max(data)
 
