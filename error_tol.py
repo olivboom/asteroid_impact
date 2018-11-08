@@ -8,7 +8,7 @@ Created on Mon Nov  5 15:15:37 2018
 import numpy as np
 import matplotlib.pyplot as plt
 import run
-import plotting_analytical_assumptions
+#import plotting_analytical_assumptions
 
 """
 def read_chelyabinsk(filename):
@@ -23,15 +23,15 @@ def read_chelyabinsk(filename):
 
     return z, KE 
 
-
+"""
 def error_tol(sol_ana, sol_num):
     sol_ana = np.array(sol_ana)
     sol_num = np.array(sol_num)
     err = abs(sol_ana - sol_num)
     
     return err
-"""
 
+"""
 def many_tol_out():
     ### Example without fragmentation
     tol_array = np.logspace(-5,-2,10)
@@ -50,33 +50,22 @@ def many_tol_out():
         err_num.append(error[index])
     
     return tol_array, err_num
+"""
 
-
-def error_tol_th(sol_ana, sol_num):
-    sol_ana = np.array(sol_ana)
-    sol_num = np.array(sol_num)
-    err = abs(sol_ana[-1] - sol_num[-1])
-    return err
-
-
-def many_tol():
-    ### Example with fragmentation
+def many_tol_out():
+    ### Example without fragmentation
     tol_array = np.logspace(-5,-1,10)
     err_num = []
-    #z_ana, KE_ana = read_chelyabinsk("ChelyabinskEnergyAltitude.csv")
-    
-    
-    z_ana = np.array(z_ana)
-    KE_ana = np.array(KE_ana)
-    
-    #mask_ana = (z_ana >= 30.4)
+    index = 200
+    final_state_ana = run.run_radau_pre()
+    KE_diff_ana = np.diff(final_state_ana[6])
+    z_diff_ana = np.diff(final_state_ana[4])
+    KE_ana = KE_diff_ana/z_diff_ana*1000/4.148E12
+    KE_ana = np.append(KE_ana, 0)
     
     for elt in tol_array:
-        final_state = run.run(elt)
         
-        z = final_state[4]/1000
-        
-        #mask_num = (z >= 30.4)
+        final_state = run.run_pre(elt)
         
         KE_diff = np.diff(final_state[6])
         z_diff = np.diff(final_state[4])
@@ -84,15 +73,43 @@ def many_tol():
         KE_unit = np.append(KE_unit, 0)
         
         
-        error = error_tol_th(KE_ana,KE_unit)
+        error = error_tol(KE_ana[index],KE_unit[index])
+        err_num.append(error)
+    
+    return tol_array, err_num
+
+
+
+def many_tol():
+    ### Example with fragmentation
+    tol_array = np.logspace(-5,-1,10)
+    err_num = []
+    index = 200
+    
+    final_state_ana = run.run_radau()
+    
+    KE_diff_ana = np.diff(final_state_ana[6])
+    z_diff_ana = np.diff(final_state_ana[4])
+    KE_ana = KE_diff_ana/z_diff_ana*1000/4.148E12
+    KE_ana = np.append(KE_ana, 0)
+        
+    for elt in tol_array:
+        
+        final_state = run.run(elt)
+        
+        KE_diff = np.diff(final_state[6])
+        z_diff = np.diff(final_state[4])
+        KE_unit = KE_diff/z_diff*1000/4.148E12
+        KE_unit = np.append(KE_unit, 0)
+        
+        
+        error = error_tol(KE_ana[index],KE_unit[index])
         err_num.append(error)
         
     return tol_array, err_num    
             
 
 if __name__ == '__main__':
-#    z, KE = read_chelyabinsk("ChelyabinskEnergyAltitude.csv")    
-#    print(z, KE)
     
     fig, axs = plt.subplots(2, 1, figsize=(8, 6))
     fig.tight_layout(w_pad=5, h_pad=5)
@@ -100,7 +117,6 @@ if __name__ == '__main__':
     tol_array, err = many_tol_out()
     tol_array1, err1 = many_tol()
     
-    print(err1)
     
     axs[0].loglog(tol_array, err, "g", label="example without fragmentation")
     axs[1].loglog(tol_array1, err1, "g", label="example with fragmentation")
