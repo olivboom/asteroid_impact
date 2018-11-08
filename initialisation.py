@@ -79,23 +79,23 @@ def set_variables(name="Tunguska"):
 
 #
     if name == "Tunguska":
-        print("T")
+#        print("T")
         state_0 = Tunguska
         
     if name == "Analytical":
-        print("a")
+#        print("a")
         state_0 = Analytical
         
     if name == "Chelyabinsk":
-        print("C")
+#        print("C")
         state_0 = Chelyabinsk
         
     if name == "Fixed":
-        print("F")
+#        print("F")
         state_0 = Fixed
 
         
-    print("3", state_0)
+#    print("3", state_0)
     
     eroscode.initial_state = state_0
 #

@@ -39,14 +39,87 @@ analytical = False
 #final_state = None
 
 
+def deg_to_rad(deg):
+    return deg*np.pi / 180
+
+
+def rad_to_degrees(rad):
+    return rad*180 / np.pi
+
+
+def initial_parameter():
+    """
+    Creating the initial conditions for the quantities
+    that will be solved in the ODE solver
+
+    Returns
+    -----------------
+    An array containing the following quantities
+
+    C_D  : float,  dimensionless
+        Coefficient of drag.
+
+    C_H : float, W/(m**2*K)
+        The heat transfer coefficient
+
+    Q : float, J/kg
+        The heat of ablation constant
+
+    C_L : float, dimensionless
+        The coefficient of lift
+
+    alpha : float, dimensionless
+        Dispersion coefficient
+
+    H : float, m
+        Atmospheric scale height
+
+    rho_0 : float, kg / m ** 3
+        Atmospheric density at sea level
+
+    R_E : float, m
+        The radius of the Earth
+
+    r : float, m
+        The radius of the asteroid
+
+    g_E : float, m / 2 ** 2
+        The acceleration due to gravity of the earth
+    """
+
+    global C_D
+    global C_H
+    global Q
+    global C_L
+    global alpha
+    global H
+    global rho_0
+    global R_E
+    global g_E
+    global rho_m
+    global Y
+    global airburst_event
+    global maxKE
+    global height_maxKE
+    C_D = 1.0
+    C_H = 0.1
+    Q = 1E7
+    C_L = 1E-3
+    alpha = 0.3
+    H = 8e3
+    rho_0 = 1.2
+    R_E = 6.371e6
+    g_E = 9.81
+    rho_m = 3.3E3
+    Y = 2E50
+    airburst_event = False
     
+    maxKE = None
+    height_maxKE = None
 
 
-def geth(r,m):
-    return m/(np.pi*r**2*rho_m)
 
-def ke(m, v):
-    return 0.5 * m * v ** 2
+
 
 
 def dv(z, r, v, theta, m):
@@ -62,9 +135,23 @@ def dz(theta, v):
 
 
 def dtheta(theta, v, z, m, r):
-    print(theta, v, z, m, r, R_E)
-    return (g_E * np.cos(theta) / v) - ((C_L * rho_a(z) * area(r) * v) /
-                                        (2 * m)) - ((v * np.cos(theta)) / (R_E + z))
+#    print("start")
+#    print(R_E + z)
+#    print(g_E * np.cos(theta))
+#    print(v)
+#    
+#    print("1----")
+#    print((C_L * rho_a(z) * area(r) * v) )
+#    print((2 * m))
+#    print("2----")
+#    
+#    print((v * np.cos(theta)))
+#    print((R_E + z))
+    Term_1 = (g_E * np.cos(theta) /v)
+    Term_2 = (C_L * rho_a(z) * area(r) * v)/(2*m)
+    Term_3 = (v*np.cos(theta))/(R_E + z)
+    
+    return Term_1 - Term_2 - Term_3
 
 
 def dx(theta, v, z):
@@ -80,68 +167,66 @@ def area(r):
     return np.pi * r ** 2
 
 
-def volume(r, h):
-    return np.pi*r**2*h
-
-
-def dr(v, z, m, r):
-    h=geth(r,m)
-    return np.sqrt(7 / 2 * alpha * rho_a(z) / (m / volume(r, h))) * v
-
-
-def density(m,r):
-    return m/volume(r)	
-
-
-def mass(rho,r):
-    return rho*volume(r)
+def dr(v, z):
+    return np.sqrt(7 / 2 * alpha * rho_a(z) / rho_m) * v
 
 
 def efun(x, a, b, c):
     return a*np.exp(-b*x)+c
 
 
-def plot(t, v, z, KE, burst_index):
+def plot(t, v, m, z, KE, r, burst_index):
     fig = plt.figure(figsize=(8, 15))
     fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.7)
 
-    # fig1=plt.subplot(311)
-    ax1 = fig.add_subplot(311)
-
-    ax1.plot(t, z / 1e3)
-    ax1.set_xlabel("Time[s]")
-    ax1.set_ylabel("Altitude[km]")
-
-    popt, pcov = curve_fit(efun, t, z / 1e3, p0=(1, 1e-6, 1))
+    popt, pcov = curve_fit(efun, t, z / 1e3)
     yy = efun(t, *popt)
+
+    ax1 = fig.add_subplot(321)
+    ax1.plot(t, z / 1e3)
+    ax1.set_xlabel("Time [s]")
+    ax1.set_ylabel("Altitude [km]")
     ax1.plot(t, yy, '--r', label='{:.2f}*exp(-{:.2f}x)+{:.2f}'.format(popt[0], popt[1], popt[2]))
     ax1.legend()
+    ax1.grid()
 
-    ax2 = fig.add_subplot(312)
-    ax2.set_xlabel("Speed[km/s]")
-    ax2.set_ylabel("Altitude[km]")
+    ax2 = fig.add_subplot(322)
+    ax2.set_xlabel("Speed [km/s]")
+    ax2.set_ylabel("Altitude [km]")
     ax2.plot(v / 1e3, z / 1e3)
     ax2.set_xlim(ax2.get_xlim()[::-1])
+    ax2.grid()
 
-    ax3 = fig.add_subplot(313)
-    ax3.set_ylabel("Altitude[km]")
-    ax3.set_xlabel("Energy_Loss[kt/km]")
-    KE_diff = np.diff(KE)
+    ax3 = fig.add_subplot(323)
+    ax3.set_ylabel("Altitude [km]")
+    ax3.set_xlabel("Energy_Loss [kt/km]")
+    ke_diff = np.diff(KE)
     z_diff = np.diff(z)
-    KE_unit = abs(KE_diff / z_diff) * 1e3 / 4.18E12
+    ke_unit = abs(ke_diff / z_diff) * 1e3 / 4.18E12
+    ax3.plot(ke_unit, z[:-1] / 1e3)
+    ax3.grid()
 
-    #chec that the KE is in the right index location
-    ax3.plot(KE_unit, z[:-1] / 1e3)
-    # ax3.axhline(y=z[KE_unit.argmax()]/1e3, xmin=KE_unit[0], xmax=KE_unit[-1],color='r', linestyle='--',linewidth=0.5)
-    z_burst = z[KE_unit.argmax()] / 1e3
+    ax4 = fig.add_subplot(324)
+    ax4.set_xlabel("Mass [kg]")
+    ax4.set_ylabel("Altitude [km]")
+    ax4.plot(m / 1e3, z / 1e3)
+    ax4.set_xlim(ax4.get_xlim()[::-1])
+    ax4.grid()
+
+    ax5 = fig.add_subplot(325)
+    ax5.set_xlabel("Diameter [m]")
+    ax5.set_ylabel("Altitude [km]")
+    ax5.plot((r * 2), z / 1e3)
+    ax5.set_xlim(ax5.get_xlim()[::-1])
+    ax5.grid()
+
+    z_burst = z[ke_unit.argmax()] / 1e3
     ax3.axhline(y=z_burst, color='r', linestyle='--', linewidth=1)
-    ax3.axvline(x=KE_unit.max(), color='r', linestyle='--', linewidth=1)
+    ax3.axvline(x=ke_unit.max(), color='r', linestyle='--', linewidth=1)
     ax3.annotate('{:.2E}'.format(z_burst), xy=(0, 2 * z_burst), color='r')
-    ax3.annotate('{:.2E}'.format(np.max(KE_unit)), xy=(KE_unit.max() + KE_unit.max() / 100, 8 * z_burst),
+    ax3.annotate('{:.2E}'.format(np.max(ke_unit)), xy=(ke_unit.max() + ke_unit.max() / 100, 8 * z_burst),
                  color='r', rotation=90)
-    ax3.annotate('*', xy=(KE_unit[burst_index], z[burst_index] / 1e3))
-    # z_ana_diff,KE_ana_diff=plot()
-    # ax3.plot(z_ana_diff,KE_ana_diff)# need to lay analytical solution on top!
+    ax3.annotate('*', xy=(ke_unit[burst_index], z[burst_index] / 1e3))
     plt.show()
 
 
@@ -172,7 +257,7 @@ def ode_solver_post_burst(t, state):
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
-    f[5] = dr(v, z, m, r)
+    f[5] = dr(v, z)
     if analytical == True:
         f[1] = 0
         f[5] = 0
@@ -186,10 +271,11 @@ def main():
 #    initialisation.set_variables("Tunguska")
     
     state0 = initial_state
-    print(state0)
+#    print(state0)
 
     t0=0
     tmax=40.
+
     dt = 0.1
     t = np.arange(t0, tmax, dt)
 
@@ -204,6 +290,7 @@ def main():
     if burst_index == 0:
         print('Cratering Event')
     else:
+        airburst_event = True
         print('Airburst Event')
         
     t_new = t[burst_index]
@@ -221,24 +308,31 @@ def main():
     x=solution[4]
     KE=0.5*v**2*m
     r=solution[5]
+#    print(len(KE))
+#    print(len(z))
+#    plot(t, v, m, z, KE, r, burst_index)
 
-    plot(t, v, z, KE, burst_index)
-    
+    ke_1diff = np.diff(KE)
+    z_1diff = np.diff(z)
+    ke_unit = abs(ke_1diff / z_1diff) * 1e3 / 4.18E12
+
+    max_ke = np.max(ke_unit)
+#    print(max_ke)
     global final_state
     
-    print("C_D: ", C_D)
-    print("C_H: ", C_H)
-    print("Q: ", Q)
-    print("C_L: ", C_L)
-    print("alpha: ", alpha)
-    print("H: ", H)
-    print("R: ", R_E)
-    print("g:", g_E)
-    
-    print(analytical)
+#    print("C_D: ", C_D)
+#    print("C_H: ", C_H)
+#    print("Q: ", Q)
+#    print("C_L: ", C_L)
+#    print("alpha: ", alpha)
+#    print("H: ", H)
+#    print("R: ", R_E)
+#    print("g:", g_E)
+#    
+#    print(analytical)
 
     
-    final_state = t, v,m,theta, z,x, KE,r, burst_index
+    final_state = t, v,m,theta, z,x, KE,r, burst_index, airburst_event
 
 
 #if __name__ == "__main__":

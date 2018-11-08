@@ -105,13 +105,15 @@ def plot():
     KE_unit = abs(KE_diff/z_diff) * 1e3/_1kT
     print(np.max(KE_unit))
     
-    
+    print(KE)
     
         
     plt.plot(np.abs(KE_diff/(z_diff/1000)) /_1kT, z/1000)
     plt.ylabel("Height above ground (m)")
     plt.xlabel("KE (kT km^1)")
     plt.show()
+    
+    return z, KE
     
 if __name__ == "__main__":
     plot()
