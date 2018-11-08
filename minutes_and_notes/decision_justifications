@@ -4,3 +4,15 @@ Choice of ODE solving scheme
 
 Have chosen spherical for calculation of mass, but have used circle for
 drag coefficient. 
+
+
+Mars data decisions
+difference in 
+density at sea level, gravity, radius of mars, astmospheric scale height
+
+density at sea level = 0.02 kg/m^3        # https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+gravity = 0.38 * g_E                      # http://planetary-science.org/mars-research/martian-atmosphere/
+radius = 3396e3 m                         # https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+atsmopheric scale height = 11.1 e3        # https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+heat transfer coefficient                 # does change due to the chemistry but can assume constant
+heat of ablation constant                 # does change but can assume constant
