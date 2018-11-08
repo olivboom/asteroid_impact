@@ -16,6 +16,16 @@ global R_E
 global g_E
 global rho_m
 global Y
+global KEs
+global Heights
+global ensemble
+global initial_state
+global analytical
+
+KEs = []
+Heights = []
+rho_m = 3.3E3
+Y = 2e6
 
 def deg_to_rad(deg):
     """
@@ -31,47 +41,6 @@ def rad_to_degrees(rad):
     for a given angle in radians
     """
     return rad*180 / np.pi
-
-
-
-global initial_state
-global analytical
-#global final_state
-
-C_D = None
-C_H = None
-Q = None
-C_L = None
-alpha = None
-H = None
-rho_0 = None
-R_E = None
-g_E = None
-rho_m=3.3E3
-Y = 2e6
-
-airburst_event = False
-maxKE = None
-height_maxKE = None
-
-ensemble = False
-
-
-
-
-initial_state = None
-analytical = False
-
-final_state = None
-
-
-def deg_to_rad(deg):
-    return deg*np.pi / 180
-
-
-def rad_to_degrees(rad):
-    return rad*180 / np.pi
-
 
 
 def dv(z, r, v, theta, m):
@@ -101,13 +70,11 @@ def dtheta(theta, v, z, m, r):
     of incidence relative to the horizon
     """
 
-    Term_1 = (g_E * np.cos(theta) /v)
-    Term_2 = (C_L * rho_a(z) * area(r) * v)/(2*m)
-    Term_3 = (v*np.cos(theta))/(R_E + z)
+    term_1 = (g_E * np.cos(theta) / v)
+    term_2 = (C_L * rho_a(z) * area(r) * v)/(2 * m)
+    term_3 = (v * np.cos(theta)) / (R_E + z)
     
-    return Term_1 - Term_2 - Term_3
-
-
+    return term_1 - term_2 - term_3
 
 
 def dx(theta, v, z):
@@ -148,24 +115,16 @@ def efun(x, a, b, c):
     return a*np.exp(-b*x)+c
 
 def find_ke_max(data):
-    t, v,m,theta, z,x, KE,r, burst_index, airburst_event = data
+    t, v, m, theta, z, x, ke, r, burst_index, airburst_event = data
     
     z_diff = np.diff(z)
-    z_diff = np.append(z_diff,z_diff[-1])
-    
-
-
-    KE_km_kT = np.diff(KE)/np.diff(z/1000)/4.184e12
-    KE_km_kT = np.append(KE_km_kT,KE_km_kT[-1])
-
-    ke_max_value = KE_km_kT.max()
-    max_index = np.argmax(KE_km_kT == ke_max_value)
-    print(max_index)
-    ke_max_height = z[np.argmax(KE_km_kT == ke_max_value)]
-    print(ke_max_value)
-    print(ke_max_value, ke_max_height)   
-    plt.plot(KE_km_kT,z)
-    return KE_km_kT,z
+    z_diff = np.append(z_diff, z_diff[-1])
+    ke_per_km = np.diff(ke) / np.diff(z/1000)/4.184e12
+    ke_per_km = np.append(ke_per_km, ke_per_km[-1])
+    ke_max_value = ke_per_km.max()
+    ke_max_height = z[np.argmax(ke_per_km == ke_max_value)]
+    plt.plot(ke_per_km, z)
+    return ke_max_value, ke_max_height
 
 
 def plot(t, v, m, z, KE, r, burst_index):
@@ -248,9 +207,8 @@ def ode_solver_pre_burst(t, state):
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
-    if analytical == True:
+    if analytical is True:
         f[1] = 0
-
 
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
@@ -276,25 +234,17 @@ def ode_solver_post_burst(t, state):
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
     f[5] = dr(v, z)
-    if analytical == True:
+
+    if analytical is True:
         f[1] = 0
         f[5] = 0
 
     return f
 
-global KEs
-global Heights
 
-KEs = []
-Heights = []
 def main():
-    global ensemble
-
-    
     state0 = initial_state
-    
 
-        
     """
     Place to execute the main code functions
     """
@@ -339,27 +289,14 @@ def main():
         solution = states
 
     # plotting the quantities of interest
-    v=solution[0]
-    m=solution[1]
-    theta=solution[2]
-    z=solution[3]
-    x=solution[4]
-    ke=0.5*v**2*m
-    r=solution[5]
-    
-    ke_1diff = np.diff(ke)
-    z_1diff = np.diff(z)
-    ke_unit = abs(ke_1diff / z_1diff) * 1e3 / 4.18E12
-    
-    max_ke = np.max(ke_unit)
-    global final_state
-    
-    
-    
-    final_state = t, v,m,theta, z,x, ke,r, burst_index, airburst_event
+    v = solution[0]
+    m = solution[1]
+    theta = solution[2]
+    z = solution[3]
+    x = solution[4]
+    ke = 0.5 * v ** 2 * m
+    r = solution[5]
 
+    final_state = t, v, m, theta, z, x, ke, r, burst_index, airburst_event
 
-
-
-#if __name__ == "__main__":
-#    a = main()
+    return final_state

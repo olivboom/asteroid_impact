@@ -8,13 +8,12 @@ import numpy as np
 def run():
     initialisation.set_parameters("Earth", analytical=True)
     initialisation.set_variables("Tunguska")
-    eroscode.main()
-    return eroscode.final_state
+    return eroscode.main()
 
 data = run()
 
 
-unitke,z = find_ke_max(data)
+#unitke,z = find_ke_max(data)
 
 
 #include assert to prevent misspelling
