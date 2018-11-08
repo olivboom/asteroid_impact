@@ -14,6 +14,7 @@ import numpy as np
 import eroscode as er
 
 
+
 def confidence_prediction():
     """
     This statistical analysis if for scenarios where the initial
@@ -51,6 +52,28 @@ def confidence_prediction():
         random_array[5, n] = np.random.normal(radius_mean, radius_sigma, 1)  # radius
 
         n += 1
+        
+    return random_array
+
+def find_ke_max(data):
+    t, v,m,theta, z,x, KE,r, burst_index, airburst_event = data
+    
+    z_diff = np.diff(z)
+    z_diff = np.append(z_diff,z_diff[-1])
+    
 
 
-confidence_prediction()
+    KE_km_kT = np.diff(KE)/np.diff(z/1000)/4.184e12
+    KE_km_kT = np.append(KE_km_kT,KE_km_kT[-1])
+
+    ke_max_value = KE_km_kT.max()
+    ke_max_height = z[np.argmax(KE_km_kT == ke_max_value)]
+    return ke_max_value, ke_max_height
+
+
+def ensemble_distribution():
+    random_array = confidence_prediction()
+#    print(random_array[:,0])
+    for i in range(len(random_array[0,:])):
+        er.initial_state =random_array[:,i]
+        

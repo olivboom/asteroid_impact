@@ -5,6 +5,10 @@ Choice of ODE solving scheme
 Have chosen spherical for calculation of mass, but have used circle for
 drag coefficient. 
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> master
 Mars data decisions
 difference in 
 density at sea level, gravity, radius of mars, astmospheric scale height

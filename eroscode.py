@@ -2,7 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from scipy.optimize import curve_fit
+import initialisation
 
+
+global C_D 
+global C_H
+global Q
+global C_L
+global alpha
+global H
+global rho_0
+global R_E
+global g_E
+global rho_m
+global Y
 
 def deg_to_rad(deg):
     """
@@ -20,112 +33,45 @@ def rad_to_degrees(rad):
     return rad*180 / np.pi
 
 
-def initial_parameter():
-    """
-    Creating the initial conditions for the quantities
-    that will be solved in the ODE solver
 
-    Returns
-    -----------------
-    An array containing the following quantities
+global initial_state
+global analytical
+#global final_state
 
-    C_D  : float,  dimensionless
-        Coefficient of drag.
+C_D = None
+C_H = None
+Q = None
+C_L = None
+alpha = None
+H = None
+rho_0 = None
+R_E = None
+g_E = None
+rho_m=3.3E3
+Y = 2e6
 
-    C_H : float, W/(m**2*K)
-        The heat transfer coefficient
+airburst_event = False
+maxKE = None
+height_maxKE = None
 
-    Q : float, J/kg
-        The heat of ablation constant
-
-    C_L : float, dimensionless
-        The coefficient of lift
-
-    alpha : float, dimensionless
-        Dispersion coefficient
-
-    H : float, m
-        Atmospheric scale height
-
-    rho_0 : float, kg / m ** 3
-        Atmospheric density at sea level
-
-    R_E : float, m
-        The radius of the Earth
-
-    r : float, m
-        The radius of the asteroid
-
-    g_E : float, m / 2 ** 2
-        The acceleration due to gravity of the earth
-    """
-
-    global C_D
-    global C_H
-    global Q
-    global C_L
-    global alpha
-    global H
-    global rho_0
-    global R_E
-    global g_E
-    global rho_m
-    global Y
-
-    C_D = 1.0
-    C_H = 0.1
-    Q = 1E7
-    C_L = 1E-3
-    alpha = 0.3
-    H = 8e3
-    rho_0 = 1.2
-    R_E = 6.371e6
-    g_E = 9.81
-    rho_m = 3.3E3
-    Y = 2E6
+ensemble = False
 
 
-def initial_variables():
-    """
-    Creating the initial conditions for the quantities
-    that will be solved in the ODE solver
 
-    Returns
-    -----------------
-    An array containing the following quantities
 
-    v_init : float , m / s
-    The inital velocity
+initial_state = None
+analytical = False
 
-    m_init : float , kg
-        The intial mass
+final_state = None
 
-    theta_init : float , radians
-        The initial entry angle
 
-    z_init : float , m
-        The initial altitude that the asteroid is measured from
+def deg_to_rad(deg):
+    return deg*np.pi / 180
 
-    x_init : float , m
-        The initial condition zeroing the horizontal displacement ******** In which axes
 
-    r_init : float , m
-        The initial condition for the radius of the asteroid
-    """
+def rad_to_degrees(rad):
+    return rad*180 / np.pi
 
-    v_init = 19e3
-    m_init = 12e6
-    theta_init = deg_to_rad(20)
-    z_init = 100e3
-    x_init = 0
-    r_init = 19.5/2
-
-    return np.array([v_init,
-                     m_init,
-                     theta_init,
-                     z_init,
-                     x_init,
-                     r_init])
 
 
 def dv(z, r, v, theta, m):
@@ -154,8 +100,14 @@ def dtheta(theta, v, z, m, r):
     The ODE describing the rate of change in angle
     of incidence relative to the horizon
     """
-    return (g_E * np.cos(theta) / v) - ((C_L * rho_a(z) * area(r) * v) /
-                                        (2 * m)) - ((v * np.cos(theta)) / (R_E + z))
+
+    Term_1 = (g_E * np.cos(theta) /v)
+    Term_2 = (C_L * rho_a(z) * area(r) * v)/(2*m)
+    Term_3 = (v*np.cos(theta))/(R_E + z)
+    
+    return Term_1 - Term_2 - Term_3
+
+
 
 
 def dx(theta, v, z):
@@ -194,6 +146,26 @@ def efun(x, a, b, c):
     of altitude versus time for visualisation purposes
     """
     return a*np.exp(-b*x)+c
+
+def find_ke_max(data):
+    t, v,m,theta, z,x, KE,r, burst_index, airburst_event = data
+    
+    z_diff = np.diff(z)
+    z_diff = np.append(z_diff,z_diff[-1])
+    
+
+
+    KE_km_kT = np.diff(KE)/np.diff(z/1000)/4.184e12
+    KE_km_kT = np.append(KE_km_kT,KE_km_kT[-1])
+
+    ke_max_value = KE_km_kT.max()
+    max_index = np.argmax(KE_km_kT == ke_max_value)
+    print(max_index)
+    ke_max_height = z[np.argmax(KE_km_kT == ke_max_value)]
+    print(ke_max_value)
+    print(ke_max_value, ke_max_height)   
+    plt.plot(KE_km_kT,z)
+    return KE_km_kT,z
 
 
 def plot(t, v, m, z, KE, r, burst_index):
@@ -276,13 +248,17 @@ def ode_solver_pre_burst(t, state):
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
+    if analytical == True:
+        f[1] = 0
+
+
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
     f[5] = 0
     return f
 
-
+        
 def ode_solver_post_burst(t, state):
     """
     The set of ordinary differential equations
@@ -295,20 +271,34 @@ def ode_solver_post_burst(t, state):
     v, m, theta, z, x, r = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
+
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
     f[5] = dr(v, z)
+    if analytical == True:
+        f[1] = 0
+        f[5] = 0
+
     return f
 
+global KEs
+global Heights
 
+KEs = []
+Heights = []
 def main():
+    global ensemble
+
+    
+    state0 = initial_state
+    
+
+        
     """
     Place to execute the main code functions
     """
     # Initialising parameters and variables
-    initial_parameter()
-    state0 = initial_variables()
 
     # Determining the time step and range that will be analysed
     t0 = 0
@@ -349,13 +339,27 @@ def main():
         solution = states
 
     # plotting the quantities of interest
-    v = solution[0]
-    m = solution[1]
-    z = solution[3]
-    ke = 0.5 * m * v ** 2
-    r = solution[5]
+    v=solution[0]
+    m=solution[1]
+    theta=solution[2]
+    z=solution[3]
+    x=solution[4]
+    ke=0.5*v**2*m
+    r=solution[5]
+    
+    ke_1diff = np.diff(ke)
+    z_1diff = np.diff(z)
+    ke_unit = abs(ke_1diff / z_1diff) * 1e3 / 4.18E12
+    
+    max_ke = np.max(ke_unit)
+    global final_state
+    
+    
+    
+    final_state = t, v,m,theta, z,x, ke,r, burst_index, airburst_event
 
-    plot(t, v, m, z, ke, r, burst_index)
 
 
-main()
+
+#if __name__ == "__main__":
+#    a = main()
