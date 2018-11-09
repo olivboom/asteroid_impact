@@ -1,6 +1,5 @@
-sanaz: brief description of values and choosing numerical algorithm
-hamed: numerical integration with scipy.ivp
-miheal: analytical solution
+sanaz: values and justification on choosing numerical algorithm
+hamed: analytiacl solution
+miheal: euler model and interpolation
 Laura: error modeling
-oliver: packaging and statistical analysis,A demonstration 
-of functionality to model entry on Mars 
+oliver: ivp solver
