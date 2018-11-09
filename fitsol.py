@@ -96,7 +96,9 @@ def fitsol():
         i+=1
         R=R+0.1
         Y=Y+0.05E6
-        final_state=run.run_custom(19E3,12E6,deg20,1E5,0,R,Y,planet="Earth",show =False)
+        #final_state=run.run_custom(19E3,12E6,deg20,1E5,0,R,Y,planet="Earth",show =False)
+        variables = [19E3,12E6,deg20,1E5,0,R,3.3e3,Y]
+        final_state=run.run_custom(variables, planet="Earth",show =False, anal_assumption=False, tol = 1e-8)
         z=final_state[4]/1E3
         KE=final_state[6]/4.18E12
         mask=np.logical_and(z<=max(z_ana), z>=min(z_ana))
