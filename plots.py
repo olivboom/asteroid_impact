@@ -8,12 +8,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+
 def efun(x, a, b, c):
     """
     Overlays an exponential function onto the graph
     of altitude versus time for visualisation purposes
     """
-    return a*np.exp(-b*x)+c
+    return a * np.exp(-b * x) + c
 
 
 def plot_5_graphs(data):
@@ -85,28 +86,24 @@ def plot_5_graphs(data):
     ax3.annotate('*', xy=(ke_unit[burst_index], z[burst_index] / 1e3))
     plt.show()
 
-def ensemble_scatter(KE,height):
-    
-    tuples = zip(KE,height)
-    a = list(tuples)
-    x,y = np.array(a)[:,0], np.array(a)[:,1]
 
-    plt.plot(x,y,'.')
+def ensemble_scatter(KE, height):
+    tuples = zip(KE, height)
+    a = list(tuples)
+    x, y = np.array(a)[:, 0], np.array(a)[:, 1]
+
+    plt.plot(x, y, '.')
     plt.xlabel('KE')
     plt.ylabel('Height')
     plt.show()
 
-def analytical_comparison(analytical, numerical):
-    x1,y1 = analytical
-    t, v, m, theta, z, x, ke, r, burst_index, airburst_event = numerical
 
-    
+def analytical_comparison(analytical, numerical):
+    x1, y1 = analytical
+    t, v, m, theta, z, x, ke, r, burst_index, airburst_event = numerical
     ke_diff = np.diff(ke)
     z_diff = np.diff(z)
     ke_unit = abs(ke_diff / z_diff) * 1e3 / 4.18E12
-    plt.plot(x1,y1, '.')
+    plt.plot(x1, y1, '.')
     plt.grid()
     plt.show()
-
-    
-    
