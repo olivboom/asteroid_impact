@@ -1,0 +1,6 @@
+sanaz: brief description of values and choosing numerical algorithm
+hamed: numerical integration with scipy.ivp
+miheal: analytical solution
+Laura: error modeling
+oliver: packaging and statistical analysis,A demonstration 
+of functionality to model entry on Mars 
