@@ -78,8 +78,8 @@ def fitsol():
     weights[KEmaxind-3:KEmaxind+3]=4
     coefs = poly.polyfit(z_ana, KE_ana, 10,w=weights)
     #Y=run.setstrength(0.5E6)
-    Y=2E6
-    R=15
+    Y=0.5E6
+    R=8.75
     badfit=1
     LSE=[]
     deg20=eroscode.deg_to_rad(20)
@@ -87,8 +87,15 @@ def fitsol():
     LSE=[1E3,0.9E3]
     Rlist=[0,0]
     Ylist=[0,0]
+    i=0
+    Rinc=True
+    Yinc=False
     #for i in range(500):
-    while not np.isclose(LSE[-1],LSE[-2],rtol=1e-03, atol=1e-05):
+    #while (not np.isclose(LSE[-1],LSE[-2],rtol=1e-03, atol=1e-05)) or i>500:
+    while(i<160):
+        i+=1
+        R=R+0.1
+        Y=Y+0.05E6
         final_state=run.run_custom(19E3,12E6,deg20,1E5,0,R,Y,planet="Earth",show =False)
         z=final_state[4]/1E3
         KE=final_state[6]/4.18E12
@@ -98,16 +105,14 @@ def fitsol():
         KE_num=KE_unit[mask[:-1]]
         KE_fit = poly.polyval(z_num, coefs)
         LSE_val=np.square(np.subtract(KE_num, KE_fit)).mean()
-        print(LSE_val)
-        if LSE[-1]<LSE[-2]:
-            LSE.append(LSE_val)
-            Ylist.append(Y)
-            Rlist.append(R)
-            R-=0.1
-        elif LSE[-1]==LSE[-2]:
-            R+=0.1
-        else:
-            Y-=0.1
+        #while(LSE[-1]>LSE[-2]):
+        LSE.append(LSE_val)
+        Ylist.append(Y)
+        Rlist.append(R)
+        print(LSE_val, R, Y)
+        #if LSE[-1]<LSE[-2]:
+        #    break
+        #Y+=0.05E6
         i+=1
     Y=Ylist[LSE.index(min(LSE))]
     R=Rlist[LSE.index(min(LSE))]
