@@ -90,11 +90,20 @@ def plot_5_graphs(data):
 def ensemble_scatter(KE, height):
     tuples = zip(KE, height)
     a = list(tuples)
-    x, y = np.array(a)[:, 0], np.array(a)[:, 1]
+    x, y = np.array(a)[:, 0], np.array(a)[:, 1]/1000
 
     plt.plot(x, y, '.')
-    plt.xlabel('KE')
-    plt.ylabel('Height')
+    plt.xlabel('KE [kT/km]')
+    plt.ylabel('Height [km]')
+
+    plt.figure()
+    plt.hist(x, bins=10)
+    plt.xlabel("KE [kT/km]")
+
+    plt.figure()
+    plt.hist(y, bins=10)
+    plt.xlabel("Altitude [km]")
+
     plt.show()
 
 

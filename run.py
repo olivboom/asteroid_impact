@@ -7,9 +7,7 @@ import statistical_ensemble as se
 
 def run_asteroid(planet="Earth", asteroid='Tunguska', show=True, anal_assumption=False, tol=1e-8):
     """
-    Run the simulation for a specified asteroid and planet
-    Returns:
-            array_like
+    Run the simulation for a documented asteroid and planet
     """
 
     initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
@@ -30,12 +28,8 @@ def run_asteroid(planet="Earth", asteroid='Tunguska', show=True, anal_assumption
 
 def run_custom(variables, planet="Earth", show=True, anal_assumption=False, tol=1e-8):
     """
-    input:
-    variables = array li
-                v_init, m_init, theta_init, z_init, x_init, r_init
-                
-    output:
-        
+    Returns a simulation for a user defined asteroid with
+    customisable input parameters
     """
 
     initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
@@ -54,6 +48,17 @@ def run_custom(variables, planet="Earth", show=True, anal_assumption=False, tol=
 
 
 def run_ensemble(planet="Earth", num=10, show=True, tol=1e-8):
+    """
+    Creates a statistical ensemble for user defined normal distribution
+    for the input parameters of a asteroids
+    'Num' defines the number of simulations in the model
+    Returns
+    -----------
+    Histogram for maximum KE lost per km
+    Histogram for altitude at maximum KE loss
+    Scatter plot of altitude at max KE lost and the height
+    it occurs at for every asteroid run
+    """
     final_states = []
     ke = []
     height = []
@@ -82,6 +87,10 @@ def run_ensemble(planet="Earth", num=10, show=True, tol=1e-8):
 
 
 def analytical_compare(asteroid="Chelyabinsk"):
+    """
+    Compares the analytical solution for a known
+    numerical case given the same assumptions
+    """
     v_init, m_init, theta_init, z_init, x_init, diam_init, rho_m, y = initialisation.set_variables(asteroid)
     print(v_init, m_init, theta_init, z_init, x_init, diam_init)
 
@@ -97,6 +106,6 @@ def analytical_compare(asteroid="Chelyabinsk"):
     plots.analytical_comparison(analytical, numerical)
 
 
-#run_asteroid(planet="Earth", anal_assumption=False)
-#run_ensemble(num=200)
-analytical_compare()
+# run_asteroid(planet="Mars", anal_assumption=False)
+# run_ensemble(num=50)
+# analytical_compare()
