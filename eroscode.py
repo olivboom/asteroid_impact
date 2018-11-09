@@ -154,7 +154,7 @@ def ode_solver_post_burst(t, state):
     reentry given that the stresses on it does
     exceed the tensile strength of the asteroid
     """
-    print(state)
+#    print(state)
     f = np.zeros_like(state)
     v, m, theta, z, x, r, rho_m, Y = state
     f[0] = dv(z, r, v, theta, m)

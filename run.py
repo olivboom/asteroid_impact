@@ -10,6 +10,14 @@ import statistical_ensemble as se
 
 
 def run_asteroid(planet="Earth", asteroid = "Tunguska", show =True, anal_assumption = False, tol = 1e-8):
+    """
+    Run the simulation for a specified asteroid and planet
+    
+    Returns:
+            array_like
+            
+    """
+
     initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
     if asteroid == "Analytical Assumptions":
         initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
@@ -29,7 +37,7 @@ def run_asteroid(planet="Earth", asteroid = "Tunguska", show =True, anal_assumpt
 def run_custom(variables, planet="Earth",show =True, anal_assumption=False, tol = 1e-8):
     """
     input:
-    variables = array type
+    variables = array li
                 v_init, m_init, theta_init, z_init, x_init, r_init
                 
     output:
@@ -101,6 +109,4 @@ def analytical_compare(asteroid = "Chelyabinsk"):
     plots.analytical_comparison(analytical, numerical)
     
     
-run_asteroid()
-#
-#    
+analytical_compare()#    
