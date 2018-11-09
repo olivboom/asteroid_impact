@@ -56,6 +56,7 @@ def rho_a(z):
     """
     Returns the density for a given altitude
     """
+    print(rho_0, H)
     return rho_0 * np.exp(-z / H)
 
 

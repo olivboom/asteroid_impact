@@ -109,4 +109,4 @@ def analytical_compare(asteroid = "Chelyabinsk"):
     plots.analytical_comparison(analytical, numerical)
     
     
-analytical_compare()#    
+run_asteroid(planet = "Mars")
