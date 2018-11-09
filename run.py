@@ -10,7 +10,7 @@ def settolerance(tol):
 
 #set parameters
 def run(tol):
-    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_parameters("Earth")
     initialisation.set_variables("Chelyabinsk")
     settolerance(tol)
     return eroscode.main()
@@ -18,18 +18,18 @@ def run(tol):
 
 def run_pre(tol):
     ## without burst
-    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_parameters("Earth")
     initialisation.set_variables("Chelyabinsk")
     settolerance(tol)
     return eroscode.main_pre()
 
 def run_radau():
-    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_parameters("Earth")
     initialisation.set_variables("Chelyabinsk")
     return eroscode.main_radau()
 
 def run_radau_pre():
-    initialisation.set_parameters("Earth", analytical=True)
+    initialisation.set_parameters("Earth")
     initialisation.set_variables("Chelyabinsk")
     return eroscode.main_radau_pre()
 
