@@ -39,9 +39,14 @@ def confidence_prediction(num):
     horizontal_sigma = 0
     radius_mean = 10
     radius_sigma = 1
+    rho_m_mean = 3300
+    rho_m_sigma = 200
+    Y_mean = 2E6
+    Y_sigma = 0.1E6
+
 
     n = 0
-    random_array = np.zeros((6, num))
+    random_array = np.zeros((8, num))
 
     while n < num:
         random_array[0, n] = np.random.normal(velocity_mean, velocity_sigma, 1)  # velocity
@@ -50,6 +55,10 @@ def confidence_prediction(num):
         random_array[3, n] = np.random.normal(altitude_mean, altitude_sigma, 1)  # altitude
         random_array[4, n] = np.random.normal(horizontal_mean, horizontal_sigma, 1)  # horizontal
         random_array[5, n] = np.random.normal(radius_mean, radius_sigma, 1)  # radius
+        random_array[6, n] = np.random.normal(rho_m_mean, rho_m_sigma, 1)  # radius
+        random_array[7, n] = np.random.normal(Y_mean, Y_sigma, 1)  # radius
+
+
 
         n += 1
         

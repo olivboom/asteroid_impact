@@ -53,10 +53,10 @@ def set_parameters(planet="Earth", analytical_assumption=False):
 
         
     elif planet == "Mars":
-        eroscode.R_E = 3390e3
-        eroscode.g_E = 3.8
-        eroscode.H = 10800
-        eroscode.rho_0 = 1.2 #find out true value
+        eroscode.R_E = 3396e3
+        eroscode.g_E =9.81 * 0.38
+        eroscode.H = 11.1e3
+        eroscode.rho_0 = 0.02 #find out true value
 
     if analytical_assumption == True:
         eroscode.g_E = 0
