@@ -24,12 +24,10 @@ global analytical
 global tol
 global final_state
 
-tol = None
+#tol = None
 
-KEs = []
-Heights = []
-rho_m = 3.3E3
-Y = 2e6
+#rho_m = 3.3E3
+#Y = 2e6
 
 def deg_to_rad(deg):
     """
@@ -104,7 +102,7 @@ def area(r):
     return np.pi * r ** 2
 
 
-def dr(v, z):
+def dr(v, z, rho_m):
     """
     The ODE describing the rate of change of radius
     """
@@ -136,7 +134,7 @@ def ode_solver_pre_burst(t, state):
     """
     f = np.zeros_like(state)
 #    print(state)
-    v, m, theta, z, x, r = state
+    v, m, theta, z, x, r, rho_0, Y = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
     if analytical is True:
@@ -156,16 +154,16 @@ def ode_solver_post_burst(t, state):
     reentry given that the stresses on it does
     exceed the tensile strength of the asteroid
     """
-
+    print(state)
     f = np.zeros_like(state)
-    v, m, theta, z, x, r = state
+    v, m, theta, z, x, r, rho_m, Y = state
     f[0] = dv(z, r, v, theta, m)
     f[1] = dm(z, r, v)
 
     f[2] = dtheta(theta, v, z, m, r)
     f[3] = dz(theta, v)
     f[4] = dx(theta, v, z)
-    f[5] = dr(v, z)
+    f[5] = dr(v, z, rho_m)
 
     if analytical is True:
         f[1] = 0
@@ -195,6 +193,7 @@ def main():
     # Calculating the stresses felt by the asteroid
     v = np.array(states.y[0])
     z = np.array(states.y[3])
+    Y = np.array(states.y[7])
     tensile_stress = rho_a(z) * v ** 2
 
     # Calculating if the tensile stresses exceed the yield strength

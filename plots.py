@@ -95,3 +95,18 @@ def ensemble_scatter(KE,height):
     plt.xlabel('KE')
     plt.ylabel('Height')
     plt.show()
+
+def analytical_comparison(analytical, numerical):
+    x1,y1 = analytical
+    t, v, m, theta, z, x, ke, r, burst_index, airburst_event = numerical
+
+    
+    ke_diff = np.diff(ke)
+    z_diff = np.diff(z)
+    ke_unit = abs(ke_diff / z_diff) * 1e3 / 4.18E12
+    plt.plot(x1,y1, '.')
+    plt.grid()
+    plt.show()
+
+    
+    

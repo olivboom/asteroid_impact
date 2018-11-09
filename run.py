@@ -8,30 +8,25 @@ import statistical_ensemble as se
 
 
 
-def settolerance(tol):
-    eroscode.tol = tol
 
-
-
-
-def run_asteroid(planet="Earth", asteroid = "Tunguska", show =True):
-    initialisation.set_parameters(planet, analytical_assumption=False)
+def run_asteroid(planet="Earth", asteroid = "Tunguska", show =True, anal_assumption = False, tol = 1e-8):
+    initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
     if asteroid == "Analytical Assumptions":
-        initialisation.set_parameters(planet, analytical_assumption=True)
-    settolerance(1e-8)
+        initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
+    initialisation.settolerance(tol)
     state = initialisation.set_variables(asteroid)
     eroscode.initial_state = state
     eroscode.ensemble = False
     eroscode.main()
     final_state = eroscode.main()
     
-    
     if show == True:
         plots.plot_5_graphs(final_state)
     
     return final_state
 
-def run_custom(variables, planet="Earth",show =True):
+
+def run_custom(variables, planet="Earth",show =True, anal_assumption=False, tol = 1e-8):
     """
     input:
     variables = array type
@@ -41,10 +36,10 @@ def run_custom(variables, planet="Earth",show =True):
         
     """
     
-    initialisation.set_parameters(planet, analytical_assumption=False)
+    initialisation.set_parameters(planet, analytical_assumption=anal_assumption)
     
 
-    settolerance(1e-8)
+    initialisation.settolerance(1e-8)
     state = variables
     eroscode.initial_state = state
     eroscode.ensemble = False
@@ -57,12 +52,12 @@ def run_custom(variables, planet="Earth",show =True):
     
     return final_state
 
-def run_ensemble(planet="Earth", asteroid = "Tunguska" ,analytical=False, ensemble=False, num = 10, show =True):
+def run_ensemble(planet="Earth", asteroid = "Tunguska" ,analytical=False, ensemble=False, num = 10, show =True, tol = 1e-8):
     final_states = []
     KE = []
     height = []
     initialisation.set_parameters(planet, analytical_assumption=False)
-    settolerance(1e-8)
+    initialisation.settolerance(1e-8)
     eroscode.ensemble = True
     
     states = se.confidence_prediction(num)
@@ -85,20 +80,27 @@ def run_ensemble(planet="Earth", asteroid = "Tunguska" ,analytical=False, ensemb
     return final_states
 
         
-    
 
-#def analytical_compare(asteroid = "Tunguska"):
-#    variables = initialisation.set_variables(asteroid)
-#    parameters_ = initialisation.set_parameters_analytical_solution()
-#    plotting_analytical.analytical(variables)
+def analytical_compare(asteroid = "Chelyabinsk"):
+    #analytical assumptions, analtytical model
     
-#    plotting_analytical.analytical(variables)
-    
-#initialisation.set_parameters_analytical_solution()
-#print(plotting_analytical.returnH())
-#analytical_compare()
-#run_ensemble(num = 1000)
-#run_custom(variables = np.array([20e3, 11e6, deg_to_rad(45), 100e3, 0, 25]))
+    v_init, m_init, theta_init, z_init, x_init, diam_init,rho_m, Y = initialisation.set_variables(asteroid)
+    print(v_init, m_init, theta_init, z_init, x_init, diam_init)
 
+    plotting_analytical.initialise_parameters(C_D=1, H=8000, rho_0=1.2)
+    plotting_analytical.initialise_variables(v_init, m_init, theta_init, z_init,diam_init)
+    
+    initialisation.set_parameters(planet = "Earth", analytical_assumption=True)
+    initialisation.set_variables(asteroid)
+
+
+    analytical = plotting_analytical.analytical()
+    numerical = run_asteroid(asteroid , show = False, anal_assumption = True)
+    
+    
+    plots.analytical_comparison(analytical, numerical)
+    
+    
+run_asteroid()
 #
 #    

@@ -10,44 +10,47 @@ import initialisation
 import numpy as np
 import matplotlib.pyplot as plt
 
-global C_D
-global m
-global A
-global Theta
-global H
-global rho_0
-
-global variables
-global z_init
-global v_init
 
 
-#print(H)
+def initialise_parameters(C_D=1, H=8000, rho_0=1.2):
+    """
+    Setting the parameters and variables used in the analytical solution
+    to create the plot
+    Returns
+    -----------------
+    An array containing the following quantities
+    C_D   : float,  dimensionless
+            Coefficient of drag.
+    m     : float, kg
+            Mass of asteroid
+            Atmospheric scale height
+    rho_0 : float, kg m^-3
+            Sea level atmospheric density
+    """
 
-#H = None
-#print("H: ", H)
-def returnparameters():
-    return H,A,rho_0, Theta
 
+    print("here")
 
-def analytical(variables):
+    return C_D, H, rho_0
+
+def initialise_variables(v_init =19e3,m_init = 12e6, theta_init=20, z_init =100e3, diam_init = 19.5):
+    A = np.pi * (diam_init/2)**2
+    Theta = theta_init * (np.pi)/180
     
-    v_init, m_init, theta_init, z_init, x_init, r_init = variables
+    
+    return A, Theta, z_init, v_init, m_init
+#
+C_D, H, rho_0 = initialise_parameters()
+A, Theta, z_init, v_init, m_init = initialise_variables()
+
+
+def analytical():
     
     num = 100
-#    z = np.linspace(z_init,0, num)
-    
-    #step = (z_init/num )
-    #print(step)
-    
-    print("H: ", H)
-    print("A: ", A)
-    print("rho_0: ", rho_0)
-    print("m: ", m)
-    print("Theta: ", Theta)
+    z = np.linspace(z_init,0, num)
     
     
-    alpha = (H * A * rho_0)/(2*m*np.sin(Theta))
+    alpha = (H * A * rho_0)/(2*m_init*np.sin(Theta))
     beta = np.exp(-z_init/H)
     
     
@@ -64,22 +67,23 @@ def analytical(variables):
     
     _1kT = 4.184E12
     
-    KE = (1/2 * m *v**2)
+    KE = (1/2 * m_init *v**2)
     KE_diff = np.diff(KE)
     KE_diff = np.append(KE_diff,KE_diff[-1])
     
     KE_unit = abs(KE_diff/z_diff) * 1e3/_1kT
-    print(np.max(KE_unit))
+#    print(np.max(KE_unit))
+#    
+#    print(KE)
     
-    print(KE)
-    
-        
+    x = np.abs(KE_diff/(z_diff/1000)/_1kT)
+    y = z/1000
     plt.plot(np.abs(KE_diff/(z_diff/1000)) /_1kT, z/1000)
     plt.ylabel("Height above ground (m)")
     plt.xlabel("KE (kT km^1)")
     plt.show()
     
-    return z, KE
+    return x,y
     
 #if __name__ == "__main__":
 #    analytical()

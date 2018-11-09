@@ -19,17 +19,16 @@ def rad_to_degrees(rad):
 
 
 def asteroid_data():
-    #ASTEROID = m_init,v_init, theta, z_init, x_init, r_init
+    #ASTEROID = m_init,v_init, theta, z_init, x_init, r_init, rho_m, Y
     
-    Tunguska = np.array([20e3, 11e6, deg_to_rad(45), 100e3, 0, 25 ])
-    Analytical = np.array([19e3, 12e6, deg_to_rad(20), 100e3, 0, 9.75 ])
-    Chelyabinsk = np.array([19e3, 12e6, deg_to_rad(20), 100e3, 0, 9.75 ])
+    Tunguska = np.array([20e3, 11e6, deg_to_rad(45), 100e3, 0, 25, 3300, 2E6 ])
+    Analytical = np.array([19e3, 12e6, deg_to_rad(20), 100e3, 0, 9.75, 3300,1E6 ])
+    Chelyabinsk = np.array([19e3, 12e6, deg_to_rad(20), 100e3, 0, 9.75, 3300,1E6 ])
     
-    asteroids = np.vstack((Tunguska, Analytical, Chelyabinsk))
-
     return Tunguska, Analytical, Chelyabinsk
 
-#def ensemble_data()
+def settolerance(tol):
+    eroscode.tol = tol
 
 def set_parameters(planet="Earth", analytical_assumption=False):
     print("analytical: ", analytical_assumption)
@@ -40,6 +39,7 @@ def set_parameters(planet="Earth", analytical_assumption=False):
     eroscode.Q = 1E7
     eroscode.C_L = 1E-3
     eroscode.alpha = 0.3
+    eroscode.tol = 1e-10
     
         
     
@@ -103,9 +103,11 @@ def set_variables(name="Tunguska"):
     z_init = None
     x_init = None
     r_init = None
+    rho_m = None
+    Y = None
     
     state_0 = [v_init, m_init, theta_init, 
-                      z_init, x_init, r_init]
+                      z_init, x_init, r_init, rho_m, Y]
     Tunguska, Analytical, Chelyabinsk = asteroid_data()
 
 #
