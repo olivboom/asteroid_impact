@@ -1,4 +1,4 @@
-### Armageddon - Atmospheric entry and disruption of asteroids
+# Armageddon - Atmospheric entry and disruption of asteroids
 
 ## Synopsis:
 
