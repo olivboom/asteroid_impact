@@ -11,6 +11,6 @@ The purpose of this project is to develop a fast numerical simulator to predict 
 
   # Contributors
   
-  - [**Eros Team**]
-  - [**Professor Gareth Collins**](https://www.imperial.ac.uk/people/g.collins) - Concept idea and background reading
+  - **Eros Team**
+  - **Professor Gareth Collins**(https://www.imperial.ac.uk/people/g.collins) - Concept idea and background reading
 
